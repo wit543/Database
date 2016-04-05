@@ -1,0 +1,29 @@
+{
+  "name": "Database",
+  "version": "1.0.0",
+  "description": "Website teaching database",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git remote add origin https://github.com/wit543/Database.git"
+  },
+  "keywords": [
+    "Database",
+    "Express",
+    "Angular"
+  ],
+  "author": "Norawit Urailertprasert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wit543/Database/issues"
+  },
+  "homepage": "https://github.com/wit543/Database",
+  "dependencies": {
+    "express": "^4.13.3",
+    "mysql": "^2.10.2"
+  }
+}
