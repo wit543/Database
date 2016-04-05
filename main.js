@@ -8,3 +8,7 @@ var connection = mysql.createConnection({
   password: '123456789'.
   database: 'ske'
 });
+
+app.listen(80,function(){
+  console.log("listen on port: 80");
+});
