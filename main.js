@@ -5,7 +5,7 @@ var app = express();
 var connection = mysql.createConnection({
   host    : 'localhost',
   user    : 'database',
-  password: '123456789'.
+  password: '123456789',
   database: 'ske'
 });
 
