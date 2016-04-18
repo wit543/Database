@@ -17,13 +17,15 @@
     "Angular"
   ],
   "author": "Norawit Urailertprasert",
-  "license": "MIT",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/wit543/Database/issues"
   },
   "homepage": "https://github.com/wit543/Database",
   "dependencies": {
     "express": "^4.13.3",
-    "mysql": "^2.10.2"
+    "mysql": "^2.10.2",
+    "body-parser":"^1.12.0",
+    "MD5": "^1.2.1"
   }
 }
