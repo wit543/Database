@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require("body-parser");
 var md5 = require('MD5');
 app.disable('x-powered-by');
+
 function REST() {
     var self = this;
     self.connectMysql();
@@ -57,23 +58,23 @@ REST_ROUTER.prototype.handleRoutes = function(router, connection, md5) {
             }
         });
     });
-    router.post("/query",function(req, res){
-      var query = req.body.query;
-      console.log(query);
-      connection.query(query, function(err, row) {
-          if (err) {
-              res.json({
-                  "Error": true,
-                  "Message": "Error executing MySQL" + err
-              });
-          } else {
-              res.json({
-                  "Error": false,
-                  "Message": "Success",
-                  "row": row
-              });
-          }
-      });
+    router.post("/query", function(req, res) {
+        var query = req.body.query;
+        console.log(query);
+        connection.query(query, function(err, row) {
+            if (err) {
+                res.json({
+                    "Error": true,
+                    "Message": "Error executing MySQL" + err
+                });
+            } else {
+                res.json({
+                    "Error": false,
+                    "Message": "Success",
+                    "row": row
+                });
+            }
+        });
     });
     router.put("/query", function(req, res) {
         var query = req.body.query;
@@ -129,8 +130,8 @@ REST.prototype.configureExpress = function(connection) {
 
 REST.prototype.startServer = function() {
     app.listen(80, function(err) {
-        if(err)
-          console.log(err);
+        if (err)
+            console.log(err);
         console.log("All right ! I am alive at Port 80.");
     });
 }
@@ -141,7 +142,7 @@ REST.prototype.stop - function(err) {
 }
 new REST();
 app.get('/', function(req, res) {
-    res.sendFile(__dirname+"/view/index.html");
+    res.sendFile(__dirname + "/public/view/index.html");
 });
 
 
