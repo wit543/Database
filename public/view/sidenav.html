@@ -1,27 +1,20 @@
-<html> <body>
+<html>
+<body>
     <!-- jquery -->
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <!-- angularjs -->
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.min.js"></script>
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
     <!-- angular Material -->
-    <script 
-src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" 
-href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <!-- material style -->
-    <link rel="stylesheet" 
-href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+
     <!-- <script src="main.js"></script> -->
     <script type="text/javascript">
         var app = angular.module("app", []);
@@ -45,24 +38,21 @@ href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-m
             }
         });
         angular.module('sidenav', ['ngMaterial'])
-            .controller('AppCtrl', function($scope, $timeout, 
-$mdSidenav, $log) {
+            .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log) {
                 $scope.toggleLeft = buildDelayedToggler('left');
                 $scope.toggleRight = buildToggler('right');
                 $scope.isOpenRight = function() {
                     return $mdSidenav('right').isOpen();
                 };
                 /**
-                 * Supplies a function that will continue to operate 
-until the
+                 * Supplies a function that will continue to operate until the
                  * time is up.
                  */
                 function debounce(func, wait, context) {
                     var timer;
                     return function debounced() {
                         var context = $scope,
-                            args = 
-Array.prototype.slice.call(arguments);
+                            args = Array.prototype.slice.call(arguments);
                         $timeout.cancel(timer);
                         timer = $timeout(function() {
                             timer = undefined;
@@ -71,8 +61,7 @@ Array.prototype.slice.call(arguments);
                     };
                 }
                 /**
-                 * Build handler to open/close a SideNav; when animation 
-finishes
+                 * Build handler to open/close a SideNav; when animation finishes
                  * report completion in console
                  */
                 function buildDelayedToggler(navID) {
@@ -81,25 +70,23 @@ finishes
                         $mdSidenav(navID)
                             .toggle()
                             .then(function() {
-                                $log.debug("toggle " + navID + " is 
-done");
+                                $log.debug("toggle " + navID + " is done");
                             });
                     }, 200);
                 }
+
                 function buildToggler(navID) {
                     return function() {
                         /*Component lookup should always be available since we are not using `ng-if`*/
                         $mdSidenav(navID)
                             .toggle()
                             .then(function() {
-                                $log.debug("toggle " + navID + " is 
-done");
+                                $log.debug("toggle " + navID + " is done");
                             });
                     }
                 }
             })
-            .controller('LeftCtrl', function($scope, $timeout, 
-$mdSidenav, $log) {
+            .controller('LeftCtrl', function($scope, $timeout, $mdSidenav, $log) {
                 $scope.close = function() {
                     /* Component lookup should always be available since we are not using `ng-if`*/
                     $mdSidenav('left').close()
@@ -108,11 +95,9 @@ $mdSidenav, $log) {
                         });
                 };
             })
-            .controller('RightCtrl', function($scope, $timeout, 
-$mdSidenav, $log) {
+            .controller('RightCtrl', function($scope, $timeout, $mdSidenav, $log) {
                 $scope.close = function() {
-                    // Component lookup should always be available since 
-we are not using `ng-if`
+                    // Component lookup should always be available since we are not using `ng-if`
                     $mdSidenav('right').close()
                         .then(function() {
                             $log.debug("close RIGHT is done");
@@ -123,51 +108,41 @@ we are not using `ng-if`
 
     <div ng-app="sidenav" ng-controller="AppCtrl" layout="column" style="height:500px;">
         <section layout="row" flex>
-            <md-sidenav class="md-sidenav-left" md-component-id="left" 
-md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop 
-md-whiteframe="4">
+            <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
                 <md-toolbar class="md-theme-indigo">
                     <h1 class="md-toolbar-tools">Sidenav Left</h1>
                 </md-toolbar>
                 <md-content layout-padding ng-controller="LeftCtrl">
-                    <md-button ng-click="close()" class="md-primary" 
-hide-gt-md>
+                    <md-button ng-click="close()" class="md-primary" hide-gt-md>
                         Close Sidenav Left
                     </md-button>
                     <p hide-md show-gt-md>
-                        This sidenav is locked open on your device. To 
-go back to the default behavior, narrow your display.
+                        This sidenav is locked open on your device. To go back to the default behavior, narrow your display.
                     </p>
                 </md-content>
             </md-sidenav>
             <md-content flex layout-padding>
-                <div layout="column" layout-fill layout-align="top 
-center">
+                <div layout="column" layout-fill layout-align="top center">
                     <p>
-                        The left sidenav will 'lock open' on a medium 
-(>=960px wide) device.
+                        The left sidenav will 'lock open' on a medium (>=960px wide) device.
                     </p>
                     <p>
-                        The right sidenav will focus on a specific child 
-element.
+                        The right sidenav will focus on a specific child element.
                     </p>
                     <div>
-                        <md-button ng-click="toggleLeft()" 
-class="md-primary" hide-gt-md>
+                        <md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
                             Toggle left
                         </md-button>
                     </div>
                     <div>
-                        <md-button ng-click="toggleRight()" 
-ng-hide="isOpenRight()" class="md-primary">
+                        <md-button ng-click="toggleRight()" ng-hide="isOpenRight()" class="md-primary">
                             Toggle right
                         </md-button>
                     </div>
                 </div>
                 <div flex></div>
             </md-content>
-            <md-sidenav class="md-sidenav-right md-whiteframe-4dp" 
-md-component-id="right">
+            <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
                 <md-toolbar class="md-theme-light">
                     <h1 class="md-toolbar-tools">Sidenav Right</h1>
                 </md-toolbar>
@@ -175,8 +150,7 @@ md-component-id="right">
                     <form>
                         <md-input-container>
                             <label for="testInput">Test input</label>
-                            <input type="text" id="testInput" 
-ng-model="data" md-autofocus>
+                            <input type="text" id="testInput" ng-model="data" md-autofocus>
                         </md-input-container>
                     </form>
                     <md-button ng-click="close()" class="md-primary">
@@ -188,5 +162,5 @@ ng-model="data" md-autofocus>
     </div>
 
 </body>
-</html>
 
+</html>
