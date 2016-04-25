@@ -144,6 +144,9 @@ new REST();
 app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/index.html");
 });
+app.get('/sidenav',function(req,res){
+  res.sendFile(__dirname + "/public/view/sidenav.html");
+})
 
 
 //app.listen(80,function(){

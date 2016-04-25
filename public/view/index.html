@@ -1,0 +1,80 @@
+<html>
+
+<body ng-app="app" ng-controller="ctr">
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <!-- angularjs -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+    <!-- angular Material -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- material style -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+
+    <script src="main.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app", []);
+        app.controller("ctr", function($scope, $http) {
+            $scope.submit = function() {
+                console.log($scope.query);
+                $http.post("/api/query", {
+                    "query": $scope.query
+                }).then(function success(res) {
+                    console.log("success: " + res.data.Error);
+                    if (res.data.Error == true) {
+                        $scope.error = res.data.Message;
+                    } else {
+                        $scope.error = null;
+                    }
+                    console.log(res.data.row);
+                    $scope.result = res.data.row;
+                }, function err(res) {
+                    console.log("ERR" + res);
+                });
+            }
+        });
+    </script>
+    
+    <div class "row">
+        <div class="col-md-4">
+            <form>
+                <h3>Query: </h3>
+                <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom">
+                </textarea>
+                <input type="submit" class="btn btn-default" value="Submit" ng-click="submit()">
+            </form>
+        </div>
+        <div class="col-md-8" id="result">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th ng-repeat="(header, value) in result[0]">{{header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <h1 ng-bind="error" style="color: #FF5050;"></h1>
+                    <tr ng-repeat="row in result">
+                        <td ng-repeat="cell in row">
+                            {{cell}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            Hello
+        </div>
+        <div class="col-md-10">
+            World
+        </div>
+    </div>
+</body>
+
+</html>
