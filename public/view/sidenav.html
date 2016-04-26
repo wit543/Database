@@ -1,4 +1,5 @@
 <html>
+
 <body>
     <!-- jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
@@ -19,26 +20,28 @@
     <script type="text/javascript">
         var app = angular.module("app", []);
         app.controller("ctr", function($scope, $http) {
-            $scope.submit = function() {
-                console.log($scope.query);
-                $http.post("/api/query", {
-                    "query": $scope.query
-                }).then(function success(res) {
-                    console.log("success: " + res.data.Error);
-                    if (res.data.Error == true) {
-                        $scope.error = res.data.Message;
-                    } else {
-                        $scope.error = null;
-                    }
-                    console.log(res.data.row);
-                    $scope.result = res.data.row;
-                }, function err(res) {
-                    console.log("ERR" + res);
-                });
-            }
+
         });
         angular.module('sidenav', ['ngMaterial'])
-            .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log) {
+            .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http) {
+                $scope.submit = function() {
+                    console.log($scope.query);
+                    $http.post("/api/query", {
+                        "query": $scope.query
+                    }).then(function success(res) {
+                        console.log("success: " + res.data.Error);
+                        if (res.data.Error == true) {
+                            $scope.error = res.data.Message;
+                        } else {
+                            $scope.error = null;
+                        }
+                        console.log(res.data.row);
+                        $scope.result = res.data.row;
+                    }, function err(res) {
+                        console.log("ERR" + res);
+                    });
+                };
+
                 $scope.toggleLeft = buildDelayedToggler('left');
                 $scope.toggleRight = buildToggler('right');
                 $scope.isOpenRight = function() {
@@ -70,7 +73,7 @@
                         $mdSidenav(navID)
                             .toggle()
                             .then(function() {
-                                $log.debug("toggle "+navID+" is done");
+                                $log.debug("toggle " + navID + " is done");
                             });
                     }, 200);
                 }
@@ -81,7 +84,7 @@
                         $mdSidenav(navID)
                             .toggle()
                             .then(function() {
-                                $log.debug("toggle "+navID+" is done");
+                                $log.debug("toggle " + navID + " is done");
                             });
                     }
                 }
@@ -106,24 +109,25 @@
             });
     </script>
 
- <md-toolbar class="md-hue-2">
-      <div class="md-toolbar-tools">
-        <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
-          <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-        </md-button>
-        <h2>
-          <span>Toolbar with Disabled/Enabled Icon Buttons</span>
-        </h2>
-        <span flex></span>
-        <md-button class="md-icon-button" aria-label="Favorite">
-          <md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon>
-        </md-button>
-        <md-button class="md-icon-button" aria-label="More">
-          <md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
-        </md-button>
-      </div>
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+                <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+            </md-button>
+            <h2>
+         <span>Toolbar with Disabled/Enabled Icon Buttons</span>
+       </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Favorite">
+                <md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon>
+            </md-button>
+            <md-button class="md-icon-button" aria-label="More">
+                <md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
+            </md-button>
+        </div>
     </md-toolbar>
-    <div ng-app="sidenav" ng-controller="AppCtrl" layout="column" style="height:500px;">
+
+    <div ng-app="sidenav" ng-controller="AppCtrl" layout="row">
         <section layout="row" flex>
             <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
                 <md-toolbar class="md-theme-indigo">
@@ -139,26 +143,43 @@
                 </md-content>
             </md-sidenav>
             <md-content flex layout-padding>
-                <div layout="column" layout-fill layout-align="top center">
-                    <p>
-                        The left sidenav will 'lock open' on a medium (>=960px wide) device.
-                    </p>
-                    <p>
-                        The right sidenav will focus on a specific child element.
-                    </p>
-                    <div>
-                        <md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
-                            Toggle left
-                        </md-button>
-                    </div>
-                    <div>
-                        <md-button ng-click="toggleRight()" ng-hide="isOpenRight()" class="md-primary">
-                            Toggle right
-                        </md-button>
+
+
+                <div layout="column">
+                    <div class "row">
+                        <div class="col-md-4">
+                            <form>
+                                <h3>Question: </h3>
+                                <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none"></textarea>
+                                <input type="submit" class="btn btn-default" value="Submit" ng-click="submit()">
+                            </form>
+                        </div>
+                        <div class="col-md-8" id="result">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th ng-repeat="(header, value) in result[0]">{{header}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <h1 ng-bind="error" style="color: #FF5050;"></h1>
+                                    <tr ng-repeat="row in result">
+                                        <td ng-repeat="cell in row">
+                                            {{cell}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div flex></div>
+
+                <div flex>
+                    <md-button class="md-raised md-primary" ng-click="submit()">Primary</md-button>
+                    <md-button class="md-raised md-warn">Warn</md-button>
+                </div>
             </md-content>
+
             <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
                 <md-toolbar class="md-theme-light">
                     <h1 class="md-toolbar-tools">Sidenav Right</h1>
@@ -176,6 +197,7 @@
                 </md-content>
             </md-sidenav>
         </section>
+
     </div>
 
 </body>

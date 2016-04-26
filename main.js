@@ -141,6 +141,9 @@ REST.prototype.stop - function(err) {
     process.exit(1);
 }
 new REST();
+
+// app.use(express.static(__dirname + "/public"));
+
 app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/index.html");
 });
