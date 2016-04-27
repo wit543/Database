@@ -285,13 +285,15 @@
         </md-list-item>
         <md-divider ></md-divider>
         <md-list flex ng-repeat="subhead in subheads">
-            <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)" > {{ subhead.name }} </md-subheader>
-            <md-list-item class="md-1-line" ng-repeat="question in questions" ng-if="isInSub(subhead.name,question.category)"  ng-click="selectq(question.id)" ng-show="subhead.expand">
-                <div class="md-list-item-text" layout="column">
-                    <p>{{ question.name }}</p>
+            <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
+            <ul>
+            <li ng-repeat="question in questions" ng-if="isInSub(subhead.name,question.category)"  ng-click="selectq(question.id)" ng-show="subhead.expand">
+                <div class="row"  layout="column">
+                    <p style="font-size:12px" >{{ question.name }}</p>
                 </div>
-            </md-list-item>
-            <md-divider ></md-divider>
+            </li>
+            </ul>
+            <md-divider ng-show="subhead.expand"></md-divider>
             
           
         </md-list>
