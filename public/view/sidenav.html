@@ -26,24 +26,32 @@
         angular.module('sidenav', ['ngMaterial'])
             .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http) {
                 $scope.submit = function() {
+                    if($scope.buttonSummit =='next'){
+                      $scope.current_problem_id=$scope.current_problem_id+1;
+                      $scope.selectq($scope.current_problem_id);
+                      return;
+                    }
                     console.log($scope.query);
                     $http.post("/api/query", {
-                        "query": $scope.query
+                        "query": $scope.query,
+                        "problem_id": $scope.current_problem_id
                     }).then(function success(res) {
-                        console.log("success: " + res.data.Error);
-                        if (res.data.Error == true) {
-                            $scope.error = res.data.Message;
+                        console.log(res.data);
+                        if (res.data.error == true) {
+                            $scope.error = res.data.error_message;
                         } else {
                             $scope.error = null;
                         }
                         console.log(res.data.row);
                         $scope.result = res.data.row;
+                        if(res.data.correct){
+                          $scope.buttonSummit="next";
+                        }
                     }, function err(res) {
                         console.log("ERR" + res);
                     });
                 };
-
-
+                $scope.buttonSummit="submit";
                 $scope.subheads = [{
                     "name": "1",
                     "expand": false
@@ -59,57 +67,11 @@
                         sub.expand = false;
                     } else sub.expand = true;
                 };
-                $scope.questions = [{
-                    "id": 1,
-                    "category": "Basic",
-                    "name": "problem1"
-                }, {
-                    "id": 2,
-                    "category": "Basic",
-                    "name": "problem2"
-                }, {
-                    "id": 3,
-                    "category": "Basic",
-                    "name": "problem3"
-                }, {
-                    "id": 4,
-                    "category": "Basic",
-                    "name": "problem4"
-                }, {
-                    "id": 5,
-                    "category": "Basic",
-                    "name": "problem5"
-                }, {
-                    "id": 6,
-                    "category": "Advance",
-                    "name": "problem6"
-                }, {
-                    "id": 7,
-                    "category": "Advance",
-                    "name": "problem7"
-                }, {
-                    "id": 8,
-                    "category": "Advance",
-                    "name": "problem8"
-                }, {
-                    "id": 9,
-                    "category": "Advance",
-                    "name": "problem9"
-                }, {
-                    "id": 10,
-                    "category": "Advance",
-                    "name": "problem10"
-                }];
+
                 $http.post("/api/problems", {
                     "command": "problems"
                 }).then(function success(res) {
-                    console.log("success: " + res.data.Error);
-                    if (res.data.Error == true) {
-                        // $scope.error = res.data.Message;
-                    } else {
-                        // $scope.error = null;
-                    }
-                    $scope.questions =res.data.row;
+                    $scope.questions = res.data.row;
                     console.log(res.data.row);
                 }, function err(res) {
                     console.log("ERR" + res);
@@ -117,6 +79,7 @@
 
                 $scope.showbasic = false;
                 $scope.showadvance = false;
+                $scope.current_problem_id;
                 $scope.basicclick = function() {
                     if ($scope.showbasic) {
                         $scope.showbasic = false;
@@ -127,8 +90,19 @@
                         $scope.showadvance = false;
                     } else $scope.showadvance = true;
                 };
-                $scope.selectq = function(qid) {
-                    window.alert(qid);
+                $scope.selectq = function(id) {
+                    $scope.current_problem_id = id;
+                    $http.post("/api/problem", {
+                        "id": id
+                    }).then(function success(res) {
+                        if (res.data.error == true) {
+                            console.log(res.data.error_message);
+                        }
+                        $scope.question = res.data.problem;
+                        console.log(res.data.problem);
+                    }, function err(res) {
+                        console.log("ERR" + res);
+                    });
                 };
 
                 $scope.toggleLeft = buildDelayedToggler('left');
@@ -234,7 +208,7 @@
                     </div>
                     <md-content>
                         <md-list flex>
-                              <md-list flex ng-repeat="subhead in subheads">
+                            <md-list flex ng-repeat="subhead in subheads">
                                 <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
                                 <ul>
                                     <li ng-repeat="question in questions" ng-if="isInSub(subhead.name,question.chapter)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
@@ -260,7 +234,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <form>
-                                <h3>Question: </h3>
+                                <h3>Question: {{question}}</h3>
                                 <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none"></textarea>
                                 <input type="submit" class="btn btn-default" value="Submit" ng-click="submit()">
                             </form>
@@ -286,7 +260,7 @@
                 </div>
 
                 <div flex>
-                    <md-button class="md-raised md-primary" ng-click="submit()">Primary</md-button>
+                    <md-button class="md-raised md-primary" n ng-click="submit()">{{buttonSummit}}</md-button>
                     <md-button class="md-raised md-warn">Warn</md-button>
                 </div>
             </md-content>
