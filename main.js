@@ -82,18 +82,27 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
         var query = "SELECT problem from problems where problem_id=" + req.body.id;
         console.log("problem: " + query);
         connection.query(query, function(err, row) {
+          console.log(row==null);
             if (err) {
                 res.json({
                     "error": true,
                     "error_message": err
                 });
             } else {
-
-                res.json({
+                if(row.length==0){
+                  res.json({
+                    "error": true,
+                    "error_message": "no problem",
+                    "problem": ""
+                });
+                }
+                else{
+                  res.json({
                     "error": false,
                     "error_message": "",
                     "problem": row[0].problem
                 });
+              }
             }
         });
     });
