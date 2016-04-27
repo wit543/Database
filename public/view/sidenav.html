@@ -20,6 +20,58 @@
     <script type="text/javascript">
         var app = angular.module("app", []);
         app.controller("ctr", function($scope, $http) {
+//            $scope.questions = [
+//                {
+//                    "id": 1,
+//                    "category": "Basic",
+//                    "name": "problem1"
+//                },
+//                {
+//                    "id": 2,
+//                    "category": "Basic",
+//                    "name": "problem2"
+//                },
+//                {
+//                    "id": 3,
+//                    "category": "Basic",
+//                    "name": "problem3"
+//                },
+//                {
+//                    "id": 4,
+//                    "category": "Basic",
+//                    "name": "problem4"
+//                },
+//                {
+//                    "id": 5,
+//                    "category": "Basic",
+//                    "name": "problem5"
+//                },
+//                {
+//                    "id": 6,
+//                    "category": "Advance",
+//                    "name": "problem6"
+//                },
+//                {
+//                    "id": 7,
+//                    "category": "Advance",
+//                    "name": "problem7"
+//                },
+//                {
+//                    "id": 8,
+//                    "category": "Advance",
+//                    "name": "problem8"
+//                },
+//                {
+//                    "id": 9,
+//                    "category": "Advance",
+//                    "name": "problem9"
+//                },
+//                {
+//                    "id": 10,
+//                    "category": "Advance",
+//                    "name": "problem10"
+//                }
+//            ];
 
         });
         angular.module('sidenav', ['ngMaterial'])
@@ -41,6 +93,12 @@
                         console.log("ERR" + res);
                     });
                 };
+            $scope.showbasic = false;
+            $scope.basicclick = function() {
+                if($scope.showbasic){
+                    $scope.showbasic = false;
+                } else $scope.showbasic = true;
+            };
                 $scope.basics = [
       {
         notes: " problem1"
@@ -179,9 +237,9 @@
                     </p>
                         </div>
                      <md-content>
-      <md-list flex>
-        <md-subheader class="md-no-sticky" ng-click="null">Basic problems</md-subheader>
-        <md-list-item class="md-1-line" ng-repeat="item in basics" ng-click="null" ng-show>
+        <md-list flex>
+        <md-subheader class="md-no-sticky" ng-click="basicclick()">Basic problems</md-subheader>
+        <md-list-item class="md-1-line" ng-repeat="item in basics" ng-click="null" ng-show="showbasic">
         
           <div class="md-list-item-text" layout="column">
             <p>{{ item.notes }}</p>
@@ -201,6 +259,7 @@
           
        
       </md-list>
+
     </md-content>
 
                 </md-content>
