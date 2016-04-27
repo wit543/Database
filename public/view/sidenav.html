@@ -20,58 +20,7 @@
     <script type="text/javascript">
         var app = angular.module("app", []);
         app.controller("ctr", function($scope, $http) {
-//            $scope.questions = [
-//                {
-//                    "id": 1,
-//                    "category": "Basic",
-//                    "name": "problem1"
-//                },
-//                {
-//                    "id": 2,
-//                    "category": "Basic",
-//                    "name": "problem2"
-//                },
-//                {
-//                    "id": 3,
-//                    "category": "Basic",
-//                    "name": "problem3"
-//                },
-//                {
-//                    "id": 4,
-//                    "category": "Basic",
-//                    "name": "problem4"
-//                },
-//                {
-//                    "id": 5,
-//                    "category": "Basic",
-//                    "name": "problem5"
-//                },
-//                {
-//                    "id": 6,
-//                    "category": "Advance",
-//                    "name": "problem6"
-//                },
-//                {
-//                    "id": 7,
-//                    "category": "Advance",
-//                    "name": "problem7"
-//                },
-//                {
-//                    "id": 8,
-//                    "category": "Advance",
-//                    "name": "problem8"
-//                },
-//                {
-//                    "id": 9,
-//                    "category": "Advance",
-//                    "name": "problem9"
-//                },
-//                {
-//                    "id": 10,
-//                    "category": "Advance",
-//                    "name": "problem10"
-//                }
-//            ];
+            
 
         });
         angular.module('sidenav', ['ngMaterial'])
@@ -93,6 +42,76 @@
                         console.log("ERR" + res);
                     });
                 };
+            $scope.subheads = [
+                {
+                    "name": "Basic",
+                    "expand": false
+                },
+                {
+                    "name": "Advance",
+                    "expand": false
+                }
+            ];
+            $scope.isInSub = function(sub,category) {
+                return sub == category;
+            };
+            $scope.clickSubHead = function(sub){
+                if(sub.expand){
+                    sub.expand = false;
+                } else sub.expand = true;
+            };
+            $scope.questions = [
+                {
+                    "id": 1,
+                    "category": "Basic",
+                    "name": "problem1"
+                },
+                {
+                    "id": 2,
+                    "category": "Basic",
+                    "name": "problem2"
+                },
+                {
+                    "id": 3,
+                    "category": "Basic",
+                    "name": "problem3"
+                },
+                {
+                    "id": 4,
+                    "category": "Basic",
+                    "name": "problem4"
+                },
+                {
+                    "id": 5,
+                    "category": "Basic",
+                    "name": "problem5"
+                },
+                {
+                    "id": 6,
+                    "category": "Advance",
+                    "name": "problem6"
+                },
+                {
+                    "id": 7,
+                    "category": "Advance",
+                    "name": "problem7"
+                },
+                {
+                    "id": 8,
+                    "category": "Advance",
+                    "name": "problem8"
+                },
+                {
+                    "id": 9,
+                    "category": "Advance",
+                    "name": "problem9"
+                },
+                {
+                    "id": 10,
+                    "category": "Advance",
+                    "name": "problem10"
+                }
+            ];
             $scope.showbasic = false;
             $scope.showadvance = false;
             $scope.basicclick = function() {
@@ -265,8 +284,17 @@
           </div>
         </md-list-item>
         <md-divider ></md-divider>
+        <md-list flex ng-repeat="subhead in subheads">
+            <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)" > {{ subhead.name }} </md-subheader>
+            <md-list-item class="md-1-line" ng-repeat="question in questions" ng-if="isInSub(subhead.name,question.category)"  ng-click="selectq(question.id)" ng-show="subhead.expand">
+                <div class="md-list-item-text" layout="column">
+                    <p>{{ question.name }}</p>
+                </div>
+            </md-list-item>
+            <md-divider ></md-divider>
+            
           
-       
+        </md-list>
       </md-list>
 
     </md-content>
