@@ -2,7 +2,6 @@ var express = require("express");
 var mysql = require("mysql");
 var app = express();
 var bodyParser = require("body-parser");
-var md5 = require('MD5');
 app.disable('x-powered-by');
 
 function REST() {
@@ -10,113 +9,117 @@ function REST() {
     self.connectMysql();
 }
 
-var REST_ROUTER = function(router, connection, md5) {
+var SANDBOX_ROUNTER = function(router, connection) {
     var self = this;
-    self.handleRoutes(router, connection, md5);
+    self.handleRoutes(router, connection);
 }
-REST_ROUTER.prototype.handleRoutes = function(router, connection, md5) {
-    router.get('/rest', function(req, res) {
-        res.json({
-            "Message": "Hello World !"
-        });
-    });
-    router.post("/user", function(req, res) {
-        var query = "SELECT * FROM classroom";
-        connection.query(query, function(err, row) {
-            if (err) {
-                res.json({
-                    "Error": true,
-                    "Message": "Error executing MySQL"
-                });
-            } else {
-                res.json({
-                    "Error": false,
-                    "Message": "Success",
-                    "Users": row
-                });
-            }
-        });
-    });
-    router.post("/user/:table", function(req, res) {
-        var query = "SELECT * FROM ??";
-        var table = [req.params.table];
 
-        query = mysql.format(query, table);
-        console.log(query);
-        connection.query(query, function(err, row) {
-            if (err) {
-                res.json({
-                    "Error": true,
-                    "Message": "Error executing MySQL"
-                });
-            } else {
-                res.json({
-                    "Error": false,
-                    "Message": "Success",
-                    "row": row
-                });
-            }
+SANDBOX_ROUNTER.prototype.handleRoutes = function(router, connection) {
+        router.put("/question", function(req, res) {
+            var answer = req.body.question_id;
+
         });
-    });
-    router.post("/query", function(req, res) {
-        var query = req.body.query;
-        console.log(query);
-        connection.query(query, function(err, row) {
-            if (err) {
-                res.json({
-                    "Error": true,
-                    "Message": "Error executing MySQL" + err
-                });
-            } else {
-                res.json({
-                    "Error": false,
-                    "Message": "Success",
-                    "row": row
-                });
-            }
+        router.post("/query", function(req, res) {
+            var query = req.body.query;
+            console.log("sandbox "+query);
+            connection.query(query, function(err, row) {
+                if (err) {
+                    res.json({
+                        "Error": true,
+                        "Message": "Error executing MySQL" + err
+                    });
+                } else {
+                    res.json({
+                        "Error": false,
+                        "Message": "Success",
+                        "row": row
+                    });
+                }
+            });
         });
-    });
-    router.put("/query", function(req, res) {
-        var query = req.body.query;
-        console.log(query);
-        connection.query(query, function(err, row) {
-            if (err) {
-                res.json({
-                    "Error": true,
-                    "Message": "Error executing MySQL" + err
-                });
-            } else {
-                res.json({
-                    "Error": false,
-                    "Message": "Success",
-                    "row": row
-                });
-            }
-        });
-    });
+
+    }
+    // module.exports = sandbox_rounter;
+
+var PROBLEM_ROUNTER = function(router, connection) {
+    var self = this;
+    self.handleRoutes(router, connection);
+};
+
+PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
+  router.post("/problem", function(req, res) {
+      var query = req.body.id;
+      console.log("problem "+query);
+      connection.query(query, function(err, row) {
+          if (err) {
+              res.json({
+                  "Error": true,
+                  "Message": "Error executing MySQL" + err
+              });
+          } else {
+              res.json({
+                  "Error": false,
+                  "Message": "Success",
+                  "row": row
+              });
+          }
+      });
+  });
+  router.post("/problems", function(req, res) {
+      var query = "SELECT problem_id,header,chapter FROM problems";
+      console.log("problem "+query);
+      connection.query(query, function(err, row) {
+          if (err) {
+              res.json({
+                  "Error": true,
+                  "Message": "Error executing MySQL" + err
+              });
+          } else {
+              res.json({
+                  "Error": false,
+                  "Message": "Success",
+                  "row": row
+              });
+          }
+      });
+  });
 }
-module.exports = REST_ROUTER;
 
 REST.prototype.connectMysql = function() {
     var self = this;
-    var pool = mysql.createPool({
-        connecitonLimit: 100,
+    var connectionSandbox = mysql.createConnection({
         host: 'localhost',
         user: 'database',
         password: '123456789',
         database: 'ske'
     });
-    pool.getConnection(function(err, connection) {
+    connectionSandbox.connect(function(err) {
         if (err) {
             self.stop(err);
-        } else {
-            self.configureExpress(connection);
+            return;
         }
+
+        console.log('connected as id ' + connectionSandbox.threadId);
     });
+    var connectionProblem = mysql.createConnection({
+        host: 'localhost',
+        user: 'controler',
+        password: 'qwertyuiop',
+        database: 'web'
+    });
+    connectionProblem.connect(function(err) {
+        if (err) {
+            self.stop(err);
+            return;
+        }
+
+        console.log('connected as id ' + connectionProblem.threadId);
+    });
+    self.configureExpress(connectionSandbox,connectionProblem);
 
 }
 
-REST.prototype.configureExpress = function(connection) {
+REST.prototype.configureExpress = function(connectionSandbox,connectionProblem) {
     var self = this;
     app.use(bodyParser.urlencoded({
         extended: true
@@ -124,7 +127,8 @@ REST.prototype.configureExpress = function(connection) {
     app.use(bodyParser.json());
     var router = express.Router();
     app.use('/api', router);
-    var rest_router = new REST_ROUTER(router, connection, md5);
+    var sandbox_rounter = new SANDBOX_ROUNTER(router, connectionSandbox);
+    var problem_rounter = new PROBLEM_ROUNTER(router, connectionProblem);
     self.startServer();
 }
 
@@ -136,6 +140,8 @@ REST.prototype.startServer = function() {
     });
 }
 
+
+
 REST.prototype.stop - function(err) {
     console.log("ISSURE WITH MYSQL :" + err);
     process.exit(1);
@@ -143,12 +149,15 @@ REST.prototype.stop - function(err) {
 new REST();
 
 // app.use(express.static(__dirname + "/public"));
+app.use(express.static('test'));
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/index.html");
 });
-app.get('/sidenav',function(req,res){
-  res.sendFile(__dirname + "/public/view/sidenav.html");
+
+
+app.get('/sidenav', function(req, res) {
+    res.sendFile(__dirname + "/public/view/sidenav.html");
 })
 
 
