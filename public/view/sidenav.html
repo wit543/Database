@@ -190,14 +190,14 @@
         </div>
     </md-toolbar>
 
-    <div ng-app="sidenav" ng-controller="AppCtrl" layout="row">
+    <div ng-app="sidenav" ng-controller="AppCtrl" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
         <section layout="row" flex>
 
             <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
                 <md-toolbar class="md-theme-indigo">
                     <h1 class="md-toolbar-tools">Sidenav Left</h1>
                 </md-toolbar>
-                <md-content layout-padding ng-controller="LeftCtrl">
+                <md-content layout-padding ng-controller="LeftCtrl" style="overflow-x: hidden">
                     <div class="row">
                         <md-button ng-click="close()" class="md-primary" hide-gt-md>
                             Close Sidenav Left
