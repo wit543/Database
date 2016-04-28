@@ -26,10 +26,10 @@
         angular.module('sidenav', ['ngMaterial'])
             .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http) {
                 $scope.submit = function() {
-                    if($scope.buttonSummit =='next'){
-                      $scope.current_problem_id=$scope.current_problem_id+1;
-                      $scope.selectq($scope.current_problem_id);
-                      return;
+                    if ($scope.buttonSummit == 'next') {
+                        $scope.current_problem_id = $scope.current_problem_id + 1;
+                        $scope.selectq($scope.current_problem_id);
+                        return;
                     }
                     console.log($scope.query);
                     $http.post("/api/query", {
@@ -44,14 +44,14 @@
                         }
                         console.log(res.data.row);
                         $scope.result = res.data.row;
-                        if(res.data.correct){
-                          $scope.buttonSummit="next";
+                        if (res.data.correct) {
+                            $scope.buttonSummit = "next";
                         }
                     }, function err(res) {
                         console.log("ERR" + res);
                     });
                 };
-                $scope.buttonSummit="submit";
+                $scope.buttonSummit = "submit";
                 $scope.subheads = [{
                     "name": "1",
                     "expand": false
@@ -76,20 +76,7 @@
                 }, function err(res) {
                     console.log("ERR" + res);
                 });
-
-                $scope.showbasic = false;
-                $scope.showadvance = false;
                 $scope.current_problem_id;
-                $scope.basicclick = function() {
-                    if ($scope.showbasic) {
-                        $scope.showbasic = false;
-                    } else $scope.showbasic = true;
-                };
-                $scope.advanceclick = function() {
-                    if ($scope.showadvance) {
-                        $scope.showadvance = false;
-                    } else $scope.showadvance = true;
-                };
                 $scope.selectq = function(id) {
                     $scope.current_problem_id = id;
                     $http.post("/api/problem", {
@@ -104,12 +91,16 @@
                         console.log("ERR" + res);
                     });
                 };
-
+                $scope.getSolution = function(){
+                  $http.post("/api/solution",{
+                    "id":$scope.current_problem_id
+                  }).then(function success(res){
+                    alert(res.data.solution);
+                  }, function err(res){
+                    console.log("ERR"+res);
+                  });
+                }
                 $scope.toggleLeft = buildDelayedToggler('left');
-                $scope.toggleRight = buildToggler('right');
-                $scope.isOpenRight = function() {
-                    return $mdSidenav('right').isOpen();
-                };
                 /**
                  * Supplies a function that will continue to operate until the
                  * time is up.
@@ -151,55 +142,36 @@
                             });
                     }
                 }
-            })
-            .controller('LeftCtrl', function($scope, $timeout, $mdSidenav, $log) {
-                $scope.close = function() {
-                    /* Component lookup should always be available since we are not using `ng-if`*/
-                    $mdSidenav('left').close()
-                        .then(function() {
-                            $log.debug("close LEFT is done");
-                        });
-                };
-            })
-            .controller('RightCtrl', function($scope, $timeout, $mdSidenav, $log) {
-                $scope.close = function() {
-                    // Component lookup should always be available since we are not using `ng-if`
-                    $mdSidenav('right').close()
-                        .then(function() {
-                            $log.debug("close RIGHT is done");
-                        });
+                $scope.openLeftMenu = function() {
+                    console.log("in");
+                    $mdSidenav('left').toggle();
                 };
             });
     </script>
 
-    <md-toolbar class="md-hue-2">
-        <div class="md-toolbar-tools">
-            <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
-                <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-            </md-button>
-            <h2>
-         <span>Toolbar with Disabled/Enabled Icon Buttons</span>
-       </h2>
-            <span flex></span>
-            <md-button class="md-icon-button" aria-label="Favorite">
-                <md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon>
-            </md-button>
-            <md-button class="md-icon-button" aria-label="More">
-                <md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
-            </md-button>
-        </div>
-    </md-toolbar>
 
-    <div ng-app="sidenav" ng-controller="AppCtrl" layout="row">
+    <div ng-app="sidenav" ng-controller="AppCtrl">
+      <div layout="column">
+      <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+              <md-button class="md-icon-button"  aria-label="Settings" ng-click="openLeftMenu()">
+                  <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png" >
+              </md-button>
+              <h2>
+               <span>Toolbar with Disabled/Enabled Icon Buttons</span>
+             </h2>
+          </div>
+      </md-toolbar>
+    </div>
+  <div layout="column"  layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
         <section layout="row" flex>
-
             <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
                 <md-toolbar class="md-theme-indigo">
                     <h1 class="md-toolbar-tools">Sidenav Left</h1>
                 </md-toolbar>
-                <md-content layout-padding ng-controller="LeftCtrl">
+                <md-content layout-padding style="overflow-x: hidden">
                     <div class="row">
-                        <md-button ng-click="close()" class="md-primary" hide-gt-md>
+                        <md-button class="md-primary" hide-gt-md>
                             Close Sidenav Left
                         </md-button>
                         <p hide-md show-gt-md>
@@ -236,7 +208,6 @@
                             <form>
                                 <h3>Question: {{question}}</h3>
                                 <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none"></textarea>
-                                <input type="submit" class="btn btn-default" value="Submit" ng-click="submit()">
                             </form>
                         </div>
                         <div class="col-md-8" id="result">
@@ -259,30 +230,23 @@
                     </div>
                 </div>
 
-                <div flex>
-                    <md-button class="md-raised md-primary" n ng-click="submit()">{{buttonSummit}}</md-button>
-                    <md-button class="md-raised md-warn">Warn</md-button>
-                </div>
+                <md-toolbar class="md-hue-2" layout="column" style="position:fixed; bottom:0;">
+                    <div class="md-toolbar-tools">
+                        <h2>
+                         <span>Toolbar with Disabled/Enabled Icon Buttons</span>
+                       </h2>
+                        <div flex>
+                            <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
+                            <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
+                        </div>
+                    </div>
+                </md-toolbar>
             </md-content>
 
-            <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
-                <md-toolbar class="md-theme-light">
-                    <h1 class="md-toolbar-tools">Sidenav Right</h1>
-                </md-toolbar>
-                <md-content ng-controller="RightCtrl" layout-padding>
-                    <form>
-                        <md-input-container>
-                            <label for="testInput">Test input</label>
-                            <input type="text" id="testInput" ng-model="data" md-autofocus>
-                        </md-input-container>
-                    </form>
-                    <md-button ng-click="close()" class="md-primary">
-                        Close Sidenav Right
-                    </md-button>
-                </md-content>
-            </md-sidenav>
-        </section>
 
+
+        </section>
+</div>
     </div>
 
 </body>

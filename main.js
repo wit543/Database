@@ -2,8 +2,12 @@ var express = require("express");
 var mysql = require("mysql");
 var app = express();
 var bodyParser = require("body-parser");
+var fs = require('fs');
 app.disable('x-powered-by');
 
+
+var nodeadmin = require('nodeadmin');
+app.use(nodeadmin(app));
 function REST() {
     var self = this;
     self.connectMysql();
@@ -124,6 +128,32 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
             }
         });
     });
+    router.post("/solution",function (req,res) {
+      var query = "SELECT solution FROM problems WHERE problem_id = "+req.body.id;
+      connection.query(query, function(err,row){
+        if(err){
+          res.json({
+            "error":true,
+            'error_message':""+err
+          });
+        }else{
+          if(row.lenght==0){
+            res.json({
+              "error":true,
+              "error_message": "no solutuon",
+              "solution":""
+            });
+          }
+          else{
+          res.json({
+            "error":false,
+            "error_message": "success",
+            "solution":""+row[0].solution
+          });
+        }
+        }
+      });
+    })
 }
 REST.prototype.connectMysql = function() {
     var self = this;
@@ -189,13 +219,21 @@ REST.prototype.stop - function(err) {
 new REST();
 
 // app.use(express.static(__dirname + "/public"));
-app.use(express.static('test'));
+app.use(express.static('public'));
+
+app.get('/public/view/main.js',function(req,res){
+  res.sendFile(__dirname+"/public/view/main.js");
+})
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/index.html");
 });
 
-
+// app.get('/images/ic_menu_white_48px',function(req,res){
+//
+//   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
+//   res.end(img,"binary");
+// })
 app.get('/sidenav', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 })
