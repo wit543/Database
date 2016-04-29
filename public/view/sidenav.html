@@ -200,7 +200,7 @@
                                 <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
                                 <ul>
                                     <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
-                                        <div class="row" layout="column">
+                                        <div  layout="column">
                                             <p style="font-size:12px">{{ question.header }}</p>
                                         </div>
                                     </li>
