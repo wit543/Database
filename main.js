@@ -8,6 +8,7 @@ app.disable('x-powered-by');
 
 var nodeadmin = require('nodeadmin');
 app.use(nodeadmin(app));
+
 function REST() {
     var self = this;
     self.connectMysql();
@@ -86,27 +87,26 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
         var query = "SELECT problem from problems where problem_id=" + req.body.id;
         console.log("problem: " + query);
         connection.query(query, function(err, row) {
-          console.log(row==null);
+            console.log(row == null);
             if (err) {
                 res.json({
                     "error": true,
                     "error_message": err
                 });
             } else {
-                if(row.length==0){
-                  res.json({
-                    "error": true,
-                    "error_message": "no problem",
-                    "problem": ""
-                });
+                if (row.length == 0) {
+                    res.json({
+                        "error": true,
+                        "error_message": "no problem",
+                        "problem": ""
+                    });
+                } else {
+                    res.json({
+                        "error": false,
+                        "error_message": "",
+                        "problem": row[0].problem
+                    });
                 }
-                else{
-                  res.json({
-                    "error": false,
-                    "error_message": "",
-                    "problem": row[0].problem
-                });
-              }
             }
         });
     });
@@ -128,48 +128,73 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
             }
         });
     });
-    router.get("/chapters",function(req,res){
-      var query = "SELECT chapter_id,chapter_name FROM chapter";
-      connection.query(query,function(err,row){
-        if(err){
-          res.json({
-            "error":true,
-            "error_message":""+err
-          })
-        }else{
-          res.json({
-            "error":false,
-            "error_message":"success",
-            "row":row
-          })
-        }
-      })
+    router.post("/hasProblem", function(req, res) {
+        var query = "SELECT * FROM problems WHERE problem_id = " + req.body.id;
+        connection.query(query, function(err, row) {
+            if (err) {
+                res.json({
+                    "error": true,
+                    "error_message": "" + err,
+                    "hasProblem": false
+                });
+            } else {
+                if (row.lenght >= 1) {
+                    res.json({
+                        "error": false,
+                        "error_message": "success",
+                        "hasProblem": true
+                    });
+                } else {
+                    res.json({
+                        "error": false,
+                        "error_message": "success",
+                        "hasProblem": false
+                    });
+                }
+            }
+        })
     });
-    router.post("/solution",function (req,res) {
-      var query = "SELECT solution FROM problems WHERE problem_id = "+req.body.id;
-      connection.query(query, function(err,row){
-        if(err){
-          res.json({
-            "error":true,
-            'error_message':""+err
-          });
-        }else{
-          if(row.lenght==0){
-            res.json({
-              "error":true,
-              "error_message": "no solution",
-              "solution":""
-            });
-          }
-          else{
-          res.json({
-            "error":false,
-            "error_message": "success",
-            "solution":""+row[0].solution
-          });
-        }
-        }
-      });
+    router.get("/chapters", function(req, res) {
+        var query = "SELECT chapter_id,chapter_name FROM chapter";
+        connection.query(query, function(err, row) {
+            if (err) {
+                res.json({
+                    "error": true,
+                    "error_message": "" + err
+                })
+            } else {
+                res.json({
+                    "error": false,
+                    "error_message": "success",
+                    "row": row
+                })
+            }
+        })
+    });
+    router.post("/solution", function(req, res) {
+        var query = "SELECT solution FROM problems WHERE problem_id = " + req.body.id;
+        connection.query(query, function(err, row) {
+            if (err) {
+                res.json({
+                    "error": true,
+                    'error_message': "" + err
+                });
+            } else {
+                if (row.lenght == 0) {
+                    res.json({
+                        "error": true,
+                        "error_message": "no solution",
+                        "solution": ""
+                    });
+                } else {
+                    res.json({
+                        "error": false,
+                        "error_message": "success",
+                        "solution": "" + row[0].solution
+                    });
+                }
+            }
+        });
     })
 }
 REST.prototype.connectMysql = function() {
@@ -238,8 +263,12 @@ new REST();
 // app.use(express.static(__dirname + "/public"));
 app.use(express.static('public'));
 
-app.get('/public/view/main.js',function(req,res){
-  res.sendFile(__dirname+"/public/view/main.js");
+app.get("/public/view/codemirror.js", function(req, res) {
+    res.sendFile(__dirname + "/public/view/codemirror.js");
+});
+
+app.get('/public/view/main.js', function(req, res) {
+    res.sendFile(__dirname + "/public/view/main.js");
 })
 
 app.get('/', function(req, res) {
