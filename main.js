@@ -3,8 +3,9 @@ var mysql = require("mysql");
 var app = express();
 var bodyParser = require("body-parser");
 var fs = require('fs');
+var jwt = require('jsonwebtoken');
 app.disable('x-powered-by');
-
+var privateKey = "__9zwqYpGe*@=6&vBnD-mpNG*A_6?uWV";
 
 var nodeadmin = require('nodeadmin');
 app.use(nodeadmin(app));
@@ -14,12 +15,12 @@ function REST() {
     self.connectMysql();
 }
 
-var SANDBOX_ROUNTER = function(router, connectionSandbox, connectionProblem) {
+var SANDBOX_ROUTER = function(router, connectionSandbox, connectionProblem) {
     var self = this;
     self.handleRoutes(router, connectionSandbox, connectionProblem);
 }
 
-SANDBOX_ROUNTER.prototype.handleRoutes = function(router, connectionSandbox, connectionProblem) {
+SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, connectionProblem) {
         router.put("/question", function(req, res) {
             var answer = req.body.question_id;
 
@@ -77,12 +78,12 @@ SANDBOX_ROUNTER.prototype.handleRoutes = function(router, connectionSandbox, con
     }
     // module.exports = sandbox_rounter;
 
-var PROBLEM_ROUNTER = function(router, connection) {
+var PROBLEM_ROUTER = function(router, connection) {
     var self = this;
     self.handleRoutes(router, connection);
 };
 
-PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
+PROBLEM_ROUTER.prototype.handleRoutes = function(router, connection) {
     router.post("/problem", function(req, res) {
         var query = "SELECT problem from problems where problem_id=" + req.body.id;
         console.log("problem: " + query);
@@ -138,7 +139,7 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
                     "hasProblem": false
                 });
             } else {
-                if (row.lenght >= 1) {
+                if (row.length >= 1) {
                     res.json({
                         "error": false,
                         "error_message": "success",
@@ -180,7 +181,7 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
                     'error_message': "" + err
                 });
             } else {
-                if (row.lenght == 0) {
+                if (row.length == 0) {
                     res.json({
                         "error": true,
                         "error_message": "no solution",
@@ -197,6 +198,75 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
         });
     })
 }
+
+var AUTHENTICATION_ROUTER = function(router, connection) {
+    var self = this;
+    self.handleRoutes(router, connection);
+};
+AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
+    router.post('/authenticate', function(req, res) {
+        var query = "SELECT * FROM user WHERE username = '" + req.body.username + "'";
+        connection.query(query, function(err, row) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    success: false,
+                    message: 'Authentication failed. ERROR'
+                });
+            } else if (row.length == 0) {
+                res.json({
+                    success: false,
+                    message: 'Authentication failed. User not found.'
+                });
+            } else if (row.length >= 1) {
+                if (row[0].password != req.body.password) {
+                    res.json({
+                        success: false,
+                        message: 'Authentication failed. Wrong password.'
+                    });
+                } else {
+                    var token = jwt.sign(row[0], privateKey, {
+                        expiresIn: 86400 // expires in 24 hours
+                    });
+                    res.json({
+                        success: true,
+                        message: 'Enjoy your token!',
+                        token: token
+                    });
+                }
+            }
+        })
+    });
+    router.use(function(req, res, next) {
+        var token = req.body.token || req.param('token') || req.headers['x-access-token'];
+        if (token) {
+
+            // verifies secret and checks exp
+            jwt.verify(token, privateKey, function(err, decoded) {
+                if (err) {
+                    return res.json({
+                        success: false,
+                        message: 'Failed to authenticate token.'
+                    });
+                } else {
+                    // if everything is good, save to request for use in other routes
+                    req.decoded = decoded;
+                    next();
+                }
+            });
+
+        } else {
+
+            // if there is no token
+            // return an error
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+
+        }
+    });
+};
 REST.prototype.connectMysql = function() {
     var self = this;
     var connectionSandbox = mysql.createConnection({
@@ -239,8 +309,11 @@ REST.prototype.configureExpress = function(connectionSandbox, connectionProblem)
     app.use(bodyParser.json());
     var router = express.Router();
     app.use('/api', router);
-    var sandbox_rounter = new SANDBOX_ROUNTER(router, connectionSandbox, connectionProblem);
-    var problem_rounter = new PROBLEM_ROUNTER(router, connectionProblem);
+
+    var sandbox_router = new SANDBOX_ROUTER(router, connectionSandbox, connectionProblem);
+
+    var problem_router = new PROBLEM_ROUTER(router, connectionProblem);
+    var authentication_router = new AUTHENTICATION_ROUTER(router, connectionProblem);
     self.startServer();
 }
 

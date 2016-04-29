@@ -16,21 +16,9 @@
     <!-- material style -->
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
 
-    <!-- codemirror -->
-    <script src="//codemirror.net/lib/codemirror.js"></script>
-    <script src="//codemirror.net/addon/edit/matchbrackets.js"></script>
-    <script src="//codemirror.net/mode/htmlmixed/htmlmixed.js"></script>
-    <script src="//codemirror.net/mode/xml/xml.js"></script>
-    <script src="//codemirror.net/mode/javascript/javascript.js"></script>
-    <script src="//codemirror.net/mode/css/css.js"></script>
-    <script src="//codemirror.net/mode/clike/clike.js"></script>
-    <script src="//codemirror.net/mode/php/php.js"></script>
-    <script src="/view/ui-codemirror.js"></script>
-
     <!-- <script src="main.js"></script> -->
-    <script src="/public/view/codemirror.js"></script>
     <script type="text/javascript">
-        var app = angular.module("app", ['ui.codemirror']);
+        var app = angular.module("app", []);
         app.controller("ctr", function($scope, $http) {
 
 
@@ -39,16 +27,9 @@
             .controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http) {
                 $scope.submit = function() {
                     if ($scope.buttonSummit == 'next') {
-                        if ($scope.hasProblem($scope.current_problem_id + 1)) {
-                            $scope.current_problem_id = $scope.current_problem_id + 1;
-                            $scope.selectq($scope.current_problem_id);
-                            $scope.buttonSummit = "submit";
-                            return;
-                        } else {
-                            $scope.error = "No more prroblem";
-                            $scope.buttonSummit = "done";
-                            return;
-                        }
+                        $scope.current_problem_id = $scope.current_problem_id + 1;
+                        $scope.selectq($scope.current_problem_id);
+                        return;
                     }
                     console.log($scope.query);
                     $http.post("/api/query", {
@@ -78,36 +59,21 @@
                     "name": "2",
                     "expand": false
                 }];
-                $scope.hasProblem = function(id) {
-                    var hasProblem = false;
-                    $http.post("api/hasProblem", {
-                        "id": id
-                    }).then(function success(res) {
-                        if (res.data.error) {
-                            console.log("error: " + res.data.error_message);
-                        } else {
-                            hasProblem = res.data.hasProblem;
-                        }
-                    }, function err(res) {
-                        console.log("Err" + res);
-                    });
-                    return hasProblem;
-                }
-                $http.get("api/chapters").then(function success(res) {
-                    if (!res.data.error) {
-                        console.log(res.data.row);
-                        var array = [];
-                        for (var i = 0; i < res.data.row.length; i++) {
-                            array.push({
-                                "name": res.data.row[i].chapter_name,
-                                "id": res.data.row[i].chapter_id,
-                                "expand": false
-                            });
-                        }
-                        $scope.subheads = array;
+                $http.get("api/chapters").then(function success(res){
+                  if(!res.data.error){
+                    console.log(res.data.row);
+                    var array = [];
+                    for(var i=0;i<res.data.row.length;i++){
+                      array.push({
+                        "name":res.data.row[i].chapter_name,
+                        "id":res.data.row[i].chapter_id,
+                        "expand":false
+                      });
                     }
-                }, function err(res) {
-                    console.log("ERR " + res);
+                    $scope.subheads = array;
+                  }
+                },function err(res) {
+                  console.log("ERR "+res);
                 })
                 $scope.isInSub = function(sub, category) {
                     return sub == category;
@@ -141,14 +107,14 @@
                         console.log("ERR" + res);
                     });
                 };
-                $scope.getSolution = function() {
-                    $http.post("/api/solution", {
-                        "id": $scope.current_problem_id
-                    }).then(function success(res) {
-                        alert(res.data.solution);
-                    }, function err(res) {
-                        console.log("ERR" + res);
-                    });
+                $scope.getSolution = function(){
+                  $http.post("/api/solution",{
+                    "id":$scope.current_problem_id
+                  }).then(function success(res){
+                    alert(res.data.solution);
+                  }, function err(res){
+                    console.log("ERR"+res);
+                  });
                 }
                 $scope.toggleLeft = buildDelayedToggler('left');
                 /**
@@ -201,108 +167,109 @@
 
 
     <div ng-app="sidenav" ng-controller="AppCtrl">
-        <div layout="column">
-            <md-toolbar class="md-hue-2">
-                <div class="md-toolbar-tools">
-                    <md-button class="md-icon-button" aria-label="Settings" ng-click="openLeftMenu()">
-                        <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png">
-                    </md-button>
-                    <h2>
+      <div layout="column">
+      <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+              <md-button class="md-icon-button"  aria-label="Settings" ng-click="openLeftMenu()">
+                  <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png" >
+              </md-button>
+              <h2>
                <span>Toolbar with Disabled/Enabled Icon Buttons</span>
              </h2>
-                </div>
-            </md-toolbar>
-        </div>
-        <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
-            <section layout="row" flex>
-                <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
-                    <md-toolbar class="md-theme-indigo">
-                        <h1 class="md-toolbar-tools">Sidenav Left</h1>
-                    </md-toolbar>
-                    <md-content layout-padding style="overflow-x: hidden">
-                        <div class="row">
-                            <md-button class="md-primary" hide-gt-md>
-                                Close Sidenav Left
-                            </md-button>
-                            <p hide-md show-gt-md>
-                                This sidenav is locked open on your device. To go back to the default behavior, narrow your display.
-                            </p>
-                        </div>
-                        <md-content>
-                            <md-list flex>
-                                <md-list flex ng-repeat="subhead in subheads">
-                                    <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
-                                    <ul>
-                                        <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
-                                            <div layout="column">
-                                                <p style="font-size:12px">{{ question.header }}</p>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <md-divider ng-show="subhead.expand"></md-divider>
+          </div>
+      </md-toolbar>
+    </div>
+  <div layout="column"  layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
+        <section layout="row" flex>
+            <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
+                <md-toolbar class="md-theme-indigo">
+                    <h1 class="md-toolbar-tools">Sidenav Left</h1>
+                </md-toolbar>
+                <md-content layout-padding style="overflow-x: hidden">
+                    <div class="row">
+                        <md-button class="md-primary" hide-gt-md>
+                            Close Sidenav Left
+                        </md-button>
+                        <p hide-md show-gt-md>
+                            This sidenav is locked open on your device. To go back to the default behavior, narrow your display.
+                        </p>
+                    </div>
+                    <md-content>
+                        <md-list flex>
+                            <md-list flex ng-repeat="subhead in subheads">
+                                <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
+                                <ul>
+                                    <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
+                                        <div  layout="column">
+                                            <p style="font-size:12px">{{ question.header }}</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <md-divider ng-show="subhead.expand"></md-divider>
 
 
-                                </md-list>
                             </md-list>
-
-                        </md-content>
+                        </md-list>
 
                     </md-content>
-                </md-sidenav>
-                <md-content flex layout-padding>
+
+                </md-content>
+            </md-sidenav>
+            <md-content flex layout-padding>
 
 
-                    <div layout="column">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <form>
-                                    <h3>Question: {{question}}</h3>
-                                    <textarea   ui-codemirror="{
-      lineNumbers: true,
-      theme:'twilight',
-      readOnly: 'nocursor',
-      lineWrapping : true,
-      mode: 'xml'
-    }" id="code" type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none"></textarea>
-                                </form>
-                            </div>
-                            <div class="col-md-8" id="result">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th ng-repeat="(header, value) in result[0]">{{header}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <h1 ng-bind="error" style="color: #FF5050;"></h1>
-                                        <tr ng-repeat="row in result">
-                                            <td ng-repeat="cell in row">
-                                                {{cell}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <div layout="column">
+                    <div class="row" >
+                        <div class="col-md-4"　>
+                            <form >
+                                <h3　>Question: {{question}}</h3>
+                                <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none ; height: calc(100% - 192px); min-height:64px "></textarea>
+                            </form>
+                        </div>
+                        <div class="col-md-8" id="result" style="  height: calc(100vh - 192px); min-height:128px" >
+                            <table class="table table-striped" >
+                                <thead>
+                                    <tr>
+                                        <th ng-repeat="(header, value) in result[0]">{{header}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <h1 ng-bind="error" style="color: #FF5050;"></h1>
+                                    <tr ng-repeat="row in result">
+                                        <td ng-repeat="cell in row">
+                                            {{cell}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
 
-                    <md-toolbar class="md-hue-2" layout="column" style="position:fixed; bottom:0;">
-                        <div class="md-toolbar-tools">
-                            <h2>
+                <div  style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
+                    <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
+                    <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
+                </div>
+
+<!--
+                <md-toolbar class="md-hue-2" layout="column" style="position:fixed; bottom:0;">
+                    <div class="md-toolbar-tools">
+                        <h2>
                          <span>Toolbar with Disabled/Enabled Icon Buttons</span>
                        </h2>
-                            <div flex>
-                                <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
-                                <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
-                            </div>
+                        <div flex>
+                            <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
+                            <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
                         </div>
-                    </md-toolbar>
-                </md-content>
+                    </div>
+                </md-toolbar>
+-->
+            </md-content>
 
 
 
-            </section>
-        </div>
+        </section>
+</div>
     </div>
 
 </body>
