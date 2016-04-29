@@ -219,15 +219,15 @@
 
 
                 <div layout="column">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <form>
-                                <h3>Question: {{question}}</h3>
-                                <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none"></textarea>
+                    <div class="row" >
+                        <div class="col-md-4"　>
+                            <form >
+                                <h3　>Question: {{question}}</h3>
+                                <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none ; height: calc(100% - 192px); min-height:64px "></textarea>
                             </form>
                         </div>
-                        <div class="col-md-8" id="result">
-                            <table class="table table-striped">
+                        <div class="col-md-8" id="result" style="  height: calc(100vh - 192px); min-height:128px" >
+                            <table class="table table-striped" >
                                 <thead>
                                     <tr>
                                         <th ng-repeat="(header, value) in result[0]">{{header}}</th>
@@ -245,7 +245,13 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <div flex>
+                    <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
+                    <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
+                </div>
+                
+<!--
                 <md-toolbar class="md-hue-2" layout="column" style="position:fixed; bottom:0;">
                     <div class="md-toolbar-tools">
                         <h2>
@@ -257,6 +263,7 @@
                         </div>
                     </div>
                 </md-toolbar>
+-->
             </md-content>
 
 
@@ -268,3 +275,4 @@
 </body>
 
 </html>
+
