@@ -59,6 +59,22 @@
                     "name": "2",
                     "expand": false
                 }];
+                $http.get("api/chapters").then(function success(res){
+                  if(!res.data.error){
+                    console.log(res.data.row);
+                    var array = [];
+                    for(var i=0;i<res.data.row.length;i++){
+                      array.push({
+                        "name":res.data.row[i].chapter_name,
+                        "id":res.data.row[i].chapter_id,
+                        "expand":false
+                      });
+                    }
+                    $scope.subheads = array;
+                  }
+                },function err(res) {
+                  console.log("ERR "+res);
+                })
                 $scope.isInSub = function(sub, category) {
                     return sub == category;
                 };
@@ -183,7 +199,7 @@
                             <md-list flex ng-repeat="subhead in subheads">
                                 <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
                                 <ul>
-                                    <li ng-repeat="question in questions" ng-if="isInSub(subhead.name,question.chapter)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
+                                    <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
                                         <div class="row" layout="column">
                                             <p style="font-size:12px">{{ question.header }}</p>
                                         </div>

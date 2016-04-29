@@ -111,13 +111,13 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
         });
     });
     router.post("/problems", function(req, res) {
-        var query = "SELECT problem_id,header,chapter FROM problems";
+        var query = "SELECT problem_id,header,chapter_id FROM problems";
         console.log("problem: " + query);
         connection.query(query, function(err, row) {
             if (err) {
                 res.json({
-                    "Error": true,
-                    "Message": "Error executing MySQL" + err
+                    "error": true,
+                    "error_message": "Error executing MySQL" + err
                 });
             } else {
                 res.json({
@@ -127,6 +127,23 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
                 });
             }
         });
+    });
+    router.get("/chapters",function(req,res){
+      var query = "SELECT chapter_id,chapter_name FROM chapter";
+      connection.query(query,function(err,row){
+        if(err){
+          res.json({
+            "error":true,
+            "error_message":""+err
+          })
+        }else{
+          res.json({
+            "error":false,
+            "error_message":"success",
+            "row":row
+          })
+        }
+      })
     });
     router.post("/solution",function (req,res) {
       var query = "SELECT solution FROM problems WHERE problem_id = "+req.body.id;
@@ -140,7 +157,7 @@ PROBLEM_ROUNTER.prototype.handleRoutes = function(router, connection) {
           if(row.lenght==0){
             res.json({
               "error":true,
-              "error_message": "no solutuon",
+              "error_message": "no solution",
               "solution":""
             });
           }
