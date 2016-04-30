@@ -50,7 +50,7 @@
                 if ($scope.username == "" || $scope.password == "") {
                     window.alert("Please check your infomation");
                 } else {
-                    window.alert("login with username: " + $scope.username + "\npassword: " + $scope.password);
+                    window.alert("login as: " + $scope.username);
                     $http.post("api/authenticate", {
                         "username": $scope.username,
                         "password": $scope.password
@@ -69,6 +69,7 @@
             }
             $scope.logout = function() {
                 delete $window.sessionStorage.token;
+                window.alert("Log out successful!");
                 $scope.isLogin = false;
             };
             $scope.signup = function() {
@@ -113,7 +114,6 @@
             } else {
                 $scope.login();
             }
-
             $scope.username = "";
             $scope.password = "";
 
@@ -271,16 +271,24 @@
     <div ng-app="sidenav" ng-controller="AppCtrl">
         <div layout="column">
             <md-toolbar class="md-hue-2">
-                <div class="md-toolbar-tools">
+                <div class="md-toolbar-tools" >
                     <md-button class="md-icon-button" aria-label="Settings" ng-click="openLeftMenu()">
                         <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png">
                     </md-button>
                     <h2>
                <span>Toolbar with Disabled/Enabled Icon Buttons</span>
              </h2>
-
-                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">Log in</button>
-                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#signupModal" >Sign up</button>
+                <div flex>
+                    <button class="btn btn-primary btn-sm" ng-show="isLogin" ng-click="logout()" style="float: right;">Log out</button>
+                    <div style="float: right;">
+                        
+                    </div>
+                    <div ng-show="isLogin" style="float: right;">
+                        <p style="white-space: pre;"><FONT SIZE=2>Username:   {{username}}   </FONT> </p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#signupModal" ng-show="!isLogin" style="float: right; ">Sign up</button>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#loginModal" ng-show="!isLogin" style="float: right;">Log in</button>
+                </div>
                 </div>
             </md-toolbar>
         </div>
@@ -420,3 +428,4 @@
 </body>
 
 </html>
+
