@@ -115,6 +115,7 @@ PROBLEM_ROUTER.prototype.handleRoutes = function(router, connection) {
     router.post("/problems", function(req, res) {
         var query = "SELECT problem_id,header,chapter_id FROM problems";
         console.log("problem: " + query);
+        console.log(req.headers);
         connection.query(query, function(err, row) {
             if (err) {
                 res.json({
@@ -205,6 +206,7 @@ var AUTHENTICATION_ROUTER = function(router, connection) {
     self.handleRoutes(router, connection);
 };
 AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
+
     router.post('/newUser', function(req, res) {
         if (!req.body.username && !req.body.password) {
             res.json({
@@ -319,7 +321,7 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
         })
     });
     router.use(function(req, res, next) {
-        var token = req.body.token || req.param('token') || req.headers['x-access-token'];
+        var token = req.body.token || req.param('token') || req.headers['x-access-token'] || req.headers.authorization;
         if (token) {
 
             // verifies secret and checks exp
@@ -346,6 +348,9 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
             });
 
         }
+    });
+    router.get('/check',function(req,res){
+        res.send("Conected");
     });
 };
 REST.prototype.connectMysql = function() {

@@ -19,8 +19,66 @@
     <!-- <script src="main.js"></script> -->
     <script type="text/javascript">
         var app = angular.module('sidenav', ['ngMaterial']);
+        app.factory('authInterceptor', function($rootScope, $q, $window) {
+            return {
+                request: function(config) {
+                    config.headers = config.headers || {};
+                    if ($window.sessionStorage.token) {
+                      console.log("in");
+                        config.headers.Authorizations =  $window.sessionStorage.token;
+                        // config.headers.['x-access-token'] =  $window.sessionStorage.token;
+                    }
+                    return config;
+                },
+                response: function(response) {
+                    if (response.status === 401) {
+                        // handle the case where the user is not authenticated
+                    }
+                    return response || $q.when(response);
+                }
+            };
+        });
+        app.config(function ($httpProvider) {
+  $httpProvider.interceptors.push('authInterceptor');
+});
+        app.controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http, $window) {
+          $scope.username = "wit";
+          $scope.password = "321";
 
-        app.controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http) {
+            $scope.login = function(){
+              $http.post("api/authenticate",{
+                "username":$scope.username,
+                "password":$scope.password
+              }).then(function success(res){
+                if(res.data.success){
+                  console.log(res.data.token);
+                  $window.sessionStorage.token = res.data.token;
+                }else{
+                  console.log(res.data.message);
+                }
+              },function err(res){
+                console.log(res);
+              })
+            }
+            $scope.logout = function(){
+              delete $window.sessionStorage.token;
+            };
+            if($window.sessionStorage.token){
+              $http.get("/api/check")
+              .then(function success(res){
+
+                console.log(res);
+              },function error(res){
+                $scope.login();
+
+
+              });
+            }
+            else{
+              $scope.login();
+            }
+
+
             $scope.submit = function() {
                 if ($scope.buttonSummit == 'next') {
                     $scope.current_problem_id = $scope.current_problem_id + 1;
@@ -158,6 +216,7 @@
                 console.log("in");
                 $mdSidenav('left').toggle();
             };
+
         });
     </script>
 
@@ -243,7 +302,7 @@
                     </div>
 
                     <div style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
-                        <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
+                        <md-button class="md-raised md-primary" ng-click="logout()">{{buttonSummit}}</md-button>
                         <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
                     </div>
 
