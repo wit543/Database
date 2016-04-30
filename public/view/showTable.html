@@ -1,0 +1,77 @@
+<html>
+
+<body ng-app="app" ng-controller="ctr">
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <!-- angularjs -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+    <!-- angular Material -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- material style -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+    <script type="text/javascript">
+        var app = angular.module("app", []);
+        app.controller("ctr", function($scope, $http) {
+            $scope.table = [];
+            $scope.query = 'show tables';
+            $http.post("/api/query", {
+                "query": $scope.query
+            }).then(function success(res) {
+                if (res.data.Error == true) {
+                    $scope.error = res.data.Message;
+                } else {
+                    $scope.error = null;
+                }
+                console.log(res.data.row);
+                var table = res.data.row;
+                var count =0;
+                for (var i = 0; i < table.length; i++) {
+
+                    var query = "select * from " + table[i].Tables_in_ske;
+                    console.log(query);
+                    $http.post("/api/query", {
+                        "query": query
+                    }).then(function success(res) {
+
+                        res.data.row.name = table[count].Tables_in_ske;
+                          console.log(res.data.row);
+                        count++;
+                        $scope.table.push(res.data.row);
+                    }, function error(res) {
+                        console.log("ERR" + res);
+                    });
+                }
+            }, function err(res) {
+                console.log("ERR" + res);
+            });
+        });
+    </script>
+
+    <div class "row">
+        <div class="col-md-12" ng-repeat="result in table">
+            <h1>{{result.name}}</h1>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th ng-repeat="(header, value) in result[0]">{{header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <h1 ng-bind="error" style="color: #FF5050;"></h1>
+                    <tr ng-repeat="row in result">
+                        <td ng-repeat="cell in row">
+                            {{cell}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
