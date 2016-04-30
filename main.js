@@ -207,7 +207,7 @@ var AUTHENTICATION_ROUTER = function(router, connection) {
 };
 AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
 
-    router.post('/newUser', function(req, res) {
+    router.post('/createNewUser', function(req, res) {
         if (!req.body.username && !req.body.password) {
             res.json({
                 success: false,
@@ -449,7 +449,7 @@ app.get('/public/view/main.js', function(req, res) {
 })
 
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + "/public/view/index.html");
+    res.sendFile(__dirname + "/public/view/sidenav.html");
 });
 
 // app.get('/images/ic_menu_white_48px',function(req,res){

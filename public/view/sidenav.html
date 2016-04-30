@@ -24,8 +24,8 @@
                 request: function(config) {
                     config.headers = config.headers || {};
                     if ($window.sessionStorage.token) {
-                      console.log("in");
-                        config.headers.Authorization =  $window.sessionStorage.token;
+                        console.log("in");
+                        config.headers.Authorization = $window.sessionStorage.token;
                         // config.headers.['x-access-token'] =  $window.sessionStorage.token;
                     }
                     return config;
@@ -38,44 +38,79 @@
                 }
             };
         });
-        app.config(function ($httpProvider) {
-  $httpProvider.interceptors.push('authInterceptor');
-});
+        app.config(function($httpProvider) {
+            $httpProvider.interceptors.push('authInterceptor');
+        });
         app.controller('AppCtrl', function($scope, $timeout, $mdSidenav, $log, $http, $window) {
-          $scope.username = "wit";
-          $scope.password = "321";
-
-            $scope.login = function(){
-              $http.post("api/authenticate",{
-                "username":$scope.username,
-                "password":$scope.password
-              }).then(function success(res){
-                if(res.data.success){
-                  console.log(res.data.token);
-                  $window.sessionStorage.token = res.data.token;
-                }else{
-                  console.log(res.data.message);
+            $scope.username = "wit";
+            $scope.password = "321";
+            $scope.isLogin = false;
+            $scope.login = function() {
+                if ($scope.username == "" || $scope.password == "") {
+                    window.alert("Please check your infomation");
+                } else {
+                    window.alert("login with username: " + $scope.username + "\npassword: " + $scope.password);
+                    $http.post("api/authenticate", {
+                        "username": $scope.username,
+                        "password": $scope.password
+                    }).then(function success(res) {
+                        if (res.data.success) {
+                            console.log(res.data.token);
+                            $window.sessionStorage.token = res.data.token;
+                            $scope.isLogin = true;
+                        } else {
+                            console.log(res.data.message);
+                        }
+                    }, function err(res) {
+                        console.log(res);
+                    });
                 }
-              },function err(res){
-                console.log(res);
-              })
             }
-            $scope.logout = function(){
-              delete $window.sessionStorage.token;
+            $scope.logout = function() {
+                delete $window.sessionStorage.token;
+                $scope.isLogin = false;
             };
-            if($window.sessionStorage.token){
-              $http.get("/api/check")
-              .then(function success(res){
+            $scope.signup = function() {
+                if ($scope.username == "" || $scope.password == "" || $scope.confirmpassword == "" || ($scope.password != $scope.confirmpassword)) {
+                    window.alert("Please check your infomation");
+                } else {
+                    window.alert("sign up with username: " + $scope.username + "\npassword: " + $scope.password);
+                    if (!$scope.isLogin) {
+                        http.post("api/createNewUser", {
+                            "username": $scope.usernamem,
+                            "password": $scope.password
+                        }).then(function success(res) {
 
-                console.log(res);
-              },function error(res){
-                $scope.login();
-
-
-              });
+                        }, function error(res) {
+                            console.log(res);
+                        });
+                    }
+                }
             }
-            else{
-              $scope.login();
+            $scope.getProgress = function() {
+                if ($scope.isLogin) {
+                    $http.get('/api/progress', function() {
+
+                    }).then(function success(res) {
+                        $scope.progress = res.data.row;
+                    }, function error(res) {
+                        console.log(res);
+                    })
+                }
+
+            }
+            if ($window.sessionStorage.token) {
+                $http.get("/api/check")
+                    .then(function success(res) {
+
+                        console.log(res);
+                    }, function error(res) {
+                        $scope.login();
+
+
+                    });
+            } else {
+                $scope.login();
             }
 
 
@@ -231,9 +266,49 @@
                     <h2>
                <span>Toolbar with Disabled/Enabled Icon Buttons</span>
              </h2>
+             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">Log in</button>
+             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#signupModal" >Sign up</button>
                 </div>
             </md-toolbar>
         </div>
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                   <h4 class="modal-title" id="loginModalLabel">Login</h4>
+               </div>
+               <div class="modal-body">
+                   <p>Username:</p>  <input  ng-model="username"> <br>
+                   <p>Password:</p>  <input  ng-model="password"> <br>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                   <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="login()">Login</button>
+               </div>
+           </div>
+       </div>
+       </div>
+
+       <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                   <h4 class="modal-title" id="signupModalLabel">Sign up</h4>
+               </div>
+               <div class="modal-body">
+                   <p>Username:</p>  <input  ng-model="username"> <br>
+                   <p>Password:</p>  <input  ng-model="password"> <br>
+                   <p>Confirm Password:</p>  <input  ng-model="confirmpassword"> <br>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                   <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="signup()">Sign Up</button>
+               </div>
+           </div>
+       </div>
+       </div>
         <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
             <section layout="row" flex>
                 <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
