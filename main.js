@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require("body-parser");
 var fs = require('fs');
 var jwt = require('jsonwebtoken');
+var bcrypt = require('bcrypt');
 app.disable('x-powered-by');
 var privateKey = "__9zwqYpGe*@=6&vBnD-mpNG*A_6?uWV";
 
@@ -204,6 +205,40 @@ var AUTHENTICATION_ROUTER = function(router, connection) {
     self.handleRoutes(router, connection);
 };
 AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
+    router.post('/newUser', function(req, res) {
+        if (!req.body.username && !req.body.password) {
+            res.json({
+                success: false,
+                message: 'no username and password'
+            });
+            return;
+        }
+        if (!req.body.username) {
+            res.json({
+                success: false,
+                message: 'no username'
+            });
+            return;
+        }
+        if (!req.body.password) {
+            res.json({
+                success: false,
+                message: 'no username'
+            });
+            return;
+        }
+        var query = "INSERT INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + req.body.password + "') WHERE (SELECT COUNT(username) FROM user WHERE username='" + req.body.username + "') =0";
+        connection.query(query, function(err, row) {
+          if(err){
+            console.log(query);
+            console.log(err);
+          }
+            res.json({
+                "err": err,
+                "row": row
+            });
+        });
+    });
     router.post('/authenticate', function(req, res) {
         var query = "SELECT * FROM user WHERE username = '" + req.body.username + "'";
         connection.query(query, function(err, row) {
