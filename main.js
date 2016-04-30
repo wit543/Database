@@ -227,17 +227,55 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
             });
             return;
         }
-        var query = "INSERT INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + req.body.password + "') WHERE (SELECT COUNT(username) FROM user WHERE username='" + req.body.username + "') =0";
-        connection.query(query, function(err, row) {
+        bcrypt.genSalt(10,function(err,salt){
           if(err){
-            console.log(query);
-            console.log(err);
-          }
+            console.log("gen: "+err);
             res.json({
-                "err": err,
-                "row": row
+              'error gen':err
             });
+          }
+          else{
+            bcrypt.hash(req.body.password,salt,function functionName(err,hash) {
+
+              if(err){
+                              console.log("hash: "+err);
+                res.json({
+                  'error hash':err
+                });
+              }
+              else{
+                console.log(hash);
+                var query = "INSERT IGNORE INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + hash + "')";
+                connection.query(query, function(err, row) {
+                  if (err) {
+                    res.json({
+                        "error": err,
+                        "success":false
+                    });
+                  }
+                  else if(row.affectedRows==1){
+                    res.json({
+                        "err": err,
+                        "success":true
+                    });
+                  }
+                  else{
+                    res.json({
+                        "err": err,
+                        "message":"already have user",
+                        "success":false
+                    });
+                  }
+
+
+
+                });
+              }
+            })
+
+          }
         });
+
     });
     router.post('/authenticate', function(req, res) {
         var query = "SELECT * FROM user WHERE username = '" + req.body.username + "'";
@@ -254,21 +292,29 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
                     message: 'Authentication failed. User not found.'
                 });
             } else if (row.length >= 1) {
-                if (row[0].password != req.body.password) {
-                    res.json({
-                        success: false,
-                        message: 'Authentication failed. Wrong password.'
-                    });
-                } else {
-                    var token = jwt.sign(row[0], privateKey, {
-                        expiresIn: 86400 // expires in 24 hours
-                    });
-                    res.json({
-                        success: true,
-                        message: 'Enjoy your token!',
-                        token: token
-                    });
+              bcrypt.compare(req.body.password,row[0].password,function(err,isMatch){
+                if(err){
+                  res.json({
+                    "error":err
+                  });
                 }
+                else if(isMatch){
+                  var token = jwt.sign(row[0], privateKey, {
+                      expiresIn: 86400 // expires in 24 hours
+                  });
+                  res.json({
+                      success: true,
+                      message: 'Enjoy your token!',
+                      token: token
+                  });
+                }
+                else{
+                  res.json({
+                      success: false,
+                      message: 'Authentication failed. Wrong password.'
+                  });
+                }
+              });
             }
         })
     });
