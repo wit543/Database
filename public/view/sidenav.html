@@ -12,6 +12,7 @@
     <!-- angular Material -->
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
     <!-- bootstrap -->
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <!-- material style -->
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
@@ -113,6 +114,11 @@
                 $scope.login();
             }
 
+            $scope.username = "";
+            $scope.password = "";
+
+            $scope.confirmpassword = "";
+
 
             $scope.submit = function() {
                 if ($scope.buttonSummit == 'next') {
@@ -204,7 +210,7 @@
                 }, function err(res) {
                     console.log("ERR" + res);
                 });
-            }
+            };
             $scope.toggleLeft = buildDelayedToggler('left');
             /**
              * Supplies a function that will continue to operate until the
@@ -247,13 +253,19 @@
                         });
                 }
             }
+
+
             $scope.openLeftMenu = function() {
                 console.log("in");
                 $mdSidenav('left').toggle();
             };
 
+
+
         });
     </script>
+
+
 
 
     <div ng-app="sidenav" ng-controller="AppCtrl">
@@ -266,49 +278,50 @@
                     <h2>
                <span>Toolbar with Disabled/Enabled Icon Buttons</span>
              </h2>
-             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">Log in</button>
-             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#signupModal" >Sign up</button>
+
+                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">Log in</button>
+                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#signupModal" >Sign up</button>
                 </div>
             </md-toolbar>
         </div>
         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                   <h4 class="modal-title" id="loginModalLabel">Login</h4>
-               </div>
-               <div class="modal-body">
-                   <p>Username:</p>  <input  ng-model="username"> <br>
-                   <p>Password:</p>  <input  ng-model="password"> <br>
-               </div>
-               <div class="modal-footer">
-                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                   <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="login()">Login</button>
-               </div>
-           </div>
-       </div>
-       </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="loginModalLabel">Login</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Username:</p>  <input  ng-model="username"> <br>
+                    <p>Password:</p>  <input  ng-model="password"> <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="login()">Login</button>
+                </div>
+            </div>
+        </div>
+        </div>
 
-       <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                   <h4 class="modal-title" id="signupModalLabel">Sign up</h4>
-               </div>
-               <div class="modal-body">
-                   <p>Username:</p>  <input  ng-model="username"> <br>
-                   <p>Password:</p>  <input  ng-model="password"> <br>
-                   <p>Confirm Password:</p>  <input  ng-model="confirmpassword"> <br>
-               </div>
-               <div class="modal-footer">
-                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                   <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="signup()">Sign Up</button>
-               </div>
-           </div>
-       </div>
-       </div>
+        <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="signupModalLabel">Sign up</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Username:</p>  <input  ng-model="username"> <br>
+                    <p>Password:</p>  <input  ng-model="password"> <br>
+                    <p>Confirm Password:</p>  <input  ng-model="confirmpassword"> <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="signup()">Sign Up</button>
+                </div>
+            </div>
+        </div>
+        </div>
         <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
             <section layout="row" flex>
                 <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
@@ -352,6 +365,7 @@
                         <div class="row">
                             <div class="col-md-4" 　>
                                 <form>
+
                                     <h3　>Question: {{question}}</h3>
                                         <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none ; height: calc(100% - 192px); min-height:64px "></textarea>
                                 </form>
@@ -401,6 +415,7 @@
             </section>
         </div>
     </div>
+
 
 </body>
 
