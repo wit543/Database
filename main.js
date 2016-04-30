@@ -37,6 +37,7 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                         "correct": false
                     });
                 } else {
+                  if(req.body.problem_id){
                     var queryAnswer = "SELECT solution FROM problems WHERE problem_id = " + req.body.problem_id;
                     connectionProblem.query(queryAnswer, function(errA, rowA) {
                         if (errA) {
@@ -68,9 +69,25 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                             }
                         });
                     });
-
-                    // console.log(row);
-                    // console.log(answer);
+                  }
+                  else{
+                    connectionSandbox.query(req.body.query,function(err,row){
+                      if(err){
+                        res.json({
+                            "error": true,
+                            "error_message": "" + err,
+                            "correct": false
+                        });
+                      }
+                      else{
+                        res.json({
+                            "error": false,
+                            "error_message": "",
+                            "row": row
+                        });
+                      }
+                    });
+                  }
 
                 }
             });
@@ -451,7 +468,9 @@ app.get('/public/view/main.js', function(req, res) {
 app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 });
-
+app.get('/showTable', function(req, res) {
+    res.sendFile(__dirname + "/public/view/showTable.html");
+})
 // app.get('/images/ic_menu_white_48px',function(req,res){
 //
 //   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
