@@ -37,57 +37,78 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                         "correct": false
                     });
                 } else {
-                  if(req.body.problem_id){
-                    var queryAnswer = "SELECT solution FROM problems WHERE problem_id = " + req.body.problem_id;
-                    connectionProblem.query(queryAnswer, function(errA, rowA) {
-                        if (errA) {
-                            console.log("1: " + errA);
-                            return;
-                        }
-                        var answerQuery = rowA[0].solution;
-                        console.log(answerQuery);
-                        connectionSandbox.query(answerQuery, function(errA, rowA) {
+                    if (req.body.problem_id) {
+                        var queryAnswer = "SELECT solution FROM problems WHERE problem_id = " + req.body.problem_id;
+                        connectionProblem.query(queryAnswer, function(errA, rowA) {
                             if (errA) {
-                                console.log("2: " + errA);
+                                console.log("1: " + errA);
                                 return;
                             }
-                            var answer = rowA;
-                            if (JSON.stringify(answer) == JSON.stringify(row)) {
+                            var answerQuery = rowA[0].solution;
+                            console.log(answerQuery);
+                            connectionSandbox.query(answerQuery, function(errA, rowA) {
+                                if (errA) {
+                                    console.log("2: " + errA);
+                                    return;
+                                }
+                                var answer = rowA;
+                                if (JSON.stringify(answer) == JSON.stringify(row)) {
+                                    res.json({
+                                        "error": false,
+                                        "error_message": "",
+                                        "row": row,
+                                        "correct": true
+                                    });
+                                } else {
+                                    res.json({
+                                        "error": false,
+                                        "error_message": "",
+                                        "row": row,
+                                        "correct": false
+                                    });
+                                }
+                                var token = req.body.token || req.param('token') || req.headers['x-access-token'] || req.headers.authorization;
+                                if (token) {
+
+                                    // verifies secret and checks exp
+                                    jwt.verify(token, privateKey, function(err, decoded) {
+                                        if (err) {
+                                            console.log(err);
+                                            return;
+                                        }
+                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row) )+ ")";
+                                        connectionProblem.query(insertQuery, function(err, row) {
+                                            if (err) {
+                                                console.log("Err insert: "+err);
+                                                console.log(insertQuery);
+                                            } else if (row.affectedRows == 0) {
+                                                console.log(row);
+                                            }
+                                            else{
+                                              console.log(row);
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        connectionSandbox.query(req.body.query, function(err, row) {
+                            if (err) {
                                 res.json({
-                                    "error": false,
-                                    "error_message": "",
-                                    "row": row,
-                                    "correct": true
+                                    "error": true,
+                                    "error_message": "" + err,
+                                    "correct": false
                                 });
                             } else {
                                 res.json({
                                     "error": false,
                                     "error_message": "",
-                                    "row": row,
-                                    "correct": false
+                                    "row": row
                                 });
                             }
                         });
-                    });
-                  }
-                  else{
-                    connectionSandbox.query(req.body.query,function(err,row){
-                      if(err){
-                        res.json({
-                            "error": true,
-                            "error_message": "" + err,
-                            "correct": false
-                        });
-                      }
-                      else{
-                        res.json({
-                            "error": false,
-                            "error_message": "",
-                            "row": row
-                        });
-                      }
-                    });
-                  }
+                    }
 
                 }
             });
@@ -246,53 +267,49 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
             });
             return;
         }
-        bcrypt.genSalt(10,function(err,salt){
-          if(err){
-            console.log("gen: "+err);
-            res.json({
-              'error gen':err
-            });
-          }
-          else{
-            bcrypt.hash(req.body.password,salt,function functionName(err,hash) {
-
-              if(err){
-                              console.log("hash: "+err);
+        bcrypt.genSalt(10, function(err, salt) {
+            if (err) {
+                console.log("gen: " + err);
                 res.json({
-                  'error hash':err
+                    'error gen': err
                 });
-              }
-              else{
-                console.log(hash);
-                var query = "INSERT IGNORE INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + hash + "')";
-                connection.query(query, function(err, row) {
-                  if (err) {
-                    res.json({
-                        "error": err,
-                        "success":false
-                    });
-                  }
-                  else if(row.affectedRows==1){
-                    res.json({
-                        "err": err,
-                        "success":true
-                    });
-                  }
-                  else{
-                    res.json({
-                        "err": err,
-                        "message":"already have user",
-                        "success":false
-                    });
-                  }
+            } else {
+                bcrypt.hash(req.body.password, salt, function functionName(err, hash) {
+
+                    if (err) {
+                        console.log("hash: " + err);
+                        res.json({
+                            'error hash': err
+                        });
+                    } else {
+                        console.log(hash);
+                        var query = "INSERT IGNORE INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + hash + "')";
+                        connection.query(query, function(err, row) {
+                            if (err) {
+                                res.json({
+                                    "error": err,
+                                    "success": false
+                                });
+                            } else if (row.affectedRows == 1) {
+                                res.json({
+                                    "err": err,
+                                    "success": true
+                                });
+                            } else {
+                                res.json({
+                                    "err": err,
+                                    "message": "already have user",
+                                    "success": false
+                                });
+                            }
 
 
 
-                });
-              }
-            })
+                        });
+                    }
+                })
 
-          }
+            }
         });
 
     });
@@ -311,29 +328,27 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
                     message: 'Authentication failed. User not found.'
                 });
             } else if (row.length >= 1) {
-              bcrypt.compare(req.body.password,row[0].password,function(err,isMatch){
-                if(err){
-                  res.json({
-                    "error":err
-                  });
-                }
-                else if(isMatch){
-                  var token = jwt.sign(row[0], privateKey, {
-                      expiresIn: 86400 // expires in 24 hours
-                  });
-                  res.json({
-                      success: true,
-                      message: 'Enjoy your token!',
-                      token: token
-                  });
-                }
-                else{
-                  res.json({
-                      success: false,
-                      message: 'Authentication failed. Wrong password.'
-                  });
-                }
-              });
+                bcrypt.compare(req.body.password, row[0].password, function(err, isMatch) {
+                    if (err) {
+                        res.json({
+                            "error": err
+                        });
+                    } else if (isMatch) {
+                        var token = jwt.sign(row[0], privateKey, {
+                            expiresIn: 86400 // expires in 24 hours
+                        });
+                        res.json({
+                            success: true,
+                            message: 'Enjoy your token!',
+                            token: token
+                        });
+                    } else {
+                        res.json({
+                            success: false,
+                            message: 'Authentication failed. Wrong password.'
+                        });
+                    }
+                });
             }
         })
     });
@@ -366,25 +381,26 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
 
         }
     });
-    router.get('/check',function(req,res){
-        res.json({"username":req.decoded.username});
+    router.get('/check', function(req, res) {
+        res.json({
+            "username": req.decoded.username
+        });
     });
-    router.get('/progress',function(req,res){
-      var query = "SELECT * FROM grading_list WHERE username = '"+req.decoded.username+"'";
-      connection. query(query,function(err,row){
-        if(err){
-          res.json({
-            "error":true,
-            "error_message":err
-          });
-        }
-        else{
-          res.json({
-            "error":false,
-            "row":row
-          });
-        }
-      });
+    router.get('/progress', function(req, res) {
+        var query = "SELECT * FROM grading_list WHERE username = '" + req.decoded.username + "'";
+        connection.query(query, function(err, row) {
+            if (err) {
+                res.json({
+                    "error": true,
+                    "error_message": err
+                });
+            } else {
+                res.json({
+                    "error": false,
+                    "row": row
+                });
+            }
+        });
 
     });
 };
@@ -469,13 +485,13 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 });
 app.get('/showTable', function(req, res) {
-    res.sendFile(__dirname + "/public/view/showTable.html");
-})
-// app.get('/images/ic_menu_white_48px',function(req,res){
-//
-//   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
-//   res.end(img,"binary");
-// })
+        res.sendFile(__dirname + "/public/view/showTable.html");
+    })
+    // app.get('/images/ic_menu_white_48px',function(req,res){
+    //
+    //   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
+    //   res.end(img,"binary");
+    // })
 app.get('/sidenav', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 })

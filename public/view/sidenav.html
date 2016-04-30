@@ -59,6 +59,7 @@
                             console.log(res.data.token);
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
+                            $scope.getProgress();
                         } else {
                             console.log(res.data.message);
                         }
@@ -92,8 +93,9 @@
             $scope.getProgress = function() {
                 if ($scope.isLogin) {
                     $http.get('/api/progress', function() {
-
                     }).then(function success(res) {
+                      console.log("progrsss");
+                      console.log(res.data.row);
                         $scope.progress = res.data.row;
                     }, function error(res) {
                         console.log(res);
@@ -104,15 +106,14 @@
             if ($window.sessionStorage.token) {
                 $http.get("/api/check")
                     .then(function success(res) {
-
+                      $scope.isLogin=true;
+                      $scope.username= res.data.username;
+                      $scope.getProgress();
                         console.log(res);
                     }, function error(res) {
-                        $scope.login();
-
-
+                      $scope.isLogin=false;
+                        // $scope.login();
                     });
-            } else {
-                $scope.login();
             }
             $scope.username = "";
             $scope.password = "";
@@ -141,6 +142,8 @@
                     $scope.result = res.data.row;
                     if (res.data.correct) {
                         $scope.buttonSummit = "next";
+                        $scope.getProgress();
+                        $scope.progressCheck=true;
                     }
                 }, function err(res) {
                     console.log("ERR" + res);
@@ -172,6 +175,15 @@
             })
             $scope.isInSub = function(sub, category) {
                 return sub == category;
+            };
+            $scope.isDone = function(id){
+                for(var i in $scope.progress){
+                  console.log($scope.progress[i].problem_id+" "+id+" "+$scope.progress[i].correctness);
+                  if($scope.progress[i].problem_id==id && $scope.progress[i].correctness){
+                    return true;
+                  }
+                }
+                return false;
             };
             $scope.clickSubHead = function(sub) {
                 if (sub.expand) {
@@ -281,10 +293,10 @@
                 <div flex>
                     <button class="btn btn-primary btn-sm" ng-show="isLogin" ng-click="logout()" style="float: right;">Log out</button>
                     <div style="float: right;">
-                        
+
                     </div>
                     <div ng-show="isLogin" style="float: right;">
-                        <p style="white-space: pre;"><FONT SIZE=2>Username:   {{username}}   </FONT> </p>
+                        <p style="white-space: pre;"><FONT SIZE=2>Welcome,{{username}}   </FONT> </p>
                     </div>
                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#signupModal" ng-show="!isLogin" style="float: right; ">Sign up</button>
                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#loginModal" ng-show="!isLogin" style="float: right;">Log in</button>
@@ -347,12 +359,13 @@
                         </div>
                         <md-content>
                             <md-list flex>
-                                <md-list flex ng-repeat="subhead in subheads">
+                                <md-list ng-model="progressCheck"  flex ng-repeat="subhead in subheads">
                                     <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
                                     <ul>
                                         <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
-                                            <div layout="column">
-                                                <p style="font-size:12px">{{ question.header }}</p>
+                                            <div layout="row" >
+                                              <div style="width:80%;"><p style="font-size:12px" >{{ question.header }}</p></div>
+                                                <div ng-show="isDone(subhead.id)" style="width:20%; height:1em; background-color:#0F0;"></div>
                                             </div>
                                         </li>
                                     </ul>
@@ -428,4 +441,3 @@
 </body>
 
 </html>
-
