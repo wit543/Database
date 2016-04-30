@@ -25,7 +25,7 @@
                     config.headers = config.headers || {};
                     if ($window.sessionStorage.token) {
                       console.log("in");
-                        config.headers.Authorizations =  $window.sessionStorage.token;
+                        config.headers.Authorization =  $window.sessionStorage.token;
                         // config.headers.['x-access-token'] =  $window.sessionStorage.token;
                     }
                     return config;
@@ -302,7 +302,7 @@
                     </div>
 
                     <div style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
-                        <md-button class="md-raised md-primary" ng-click="logout()">{{buttonSummit}}</md-button>
+                        <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
                         <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
                     </div>
 

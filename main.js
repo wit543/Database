@@ -350,7 +350,25 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
         }
     });
     router.get('/check',function(req,res){
-        res.send("Conected");
+        res.json({"username":req.decoded.username});
+    });
+    router.get('/progress',function(req,res){
+      var query = "SELECT * FROM grading_list WHERE username = '"+req.decoded.username+"'";
+      connection. query(query,function(err,row){
+        if(err){
+          res.json({
+            "error":true,
+            "error_message":err
+          });
+        }
+        else{
+          res.json({
+            "error":false,
+            "row":row
+          });
+        }
+      });
+
     });
 };
 REST.prototype.connectMysql = function() {
