@@ -59,7 +59,7 @@
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
                             $scope.getProgress();
-                            window.alert("Welcome, " + $scope.username);
+                            window.alert("login as: " + $scope.username);
                         } else {
                             console.log(res.data.message);
                             window.alert("Please check your username and password");
@@ -81,7 +81,7 @@
                     window.alert("sign up with username: " + $scope.username + "\npassword: " + $scope.password);
                     if (!$scope.isLogin) {
                         http.post("api/createNewUser", {
-                            "username": $scope.usernamem,
+                            "username": $scope.username,
                             "password": $scope.password
                         }).then(function success(res) {
 
@@ -357,7 +357,7 @@
                                 Close Sidenav Left
                             </md-button>
                             <p hide-md show-gt-md>
-                                Choose question from the list below.
+                                Choose question from the list below. Click 'Show table' for information.
                             </p>
                         </div>
                         <md-content>
@@ -417,9 +417,10 @@
                     <div flex style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
                         <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
                         <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
+                        <md-button class="md-raised" onclick="window.open('http://wit543.xyz/showTable')">Show Table</md-button>
                         
                         <div style="float: right;">
-                            <p style="white-space: pre;"><FONT SIZE=1>powered by wit543@gmail.com   </FONT> </p>
+                            <p style="white-space: pre;"><FONT SIZE=1>powered by wit543@gmail.com     </FONT> </p>
                         </div>
                     </div>
 
@@ -437,7 +438,6 @@
                 </md-toolbar>
 -->
                 </md-content>
-
 
 
             </section>
