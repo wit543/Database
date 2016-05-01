@@ -291,7 +291,7 @@
                         <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png">
                     </md-button>
                     <h2>
-               <span>Toolbar with Disabled/Enabled Icon Buttons</span>
+               <span> Wit543 Database School </span>
              </h2>
                 <div flex>
                     <button class="btn btn-primary btn-sm" ng-show="isLogin" ng-click="logout()" style="float: right;">Log out</button>
@@ -299,7 +299,7 @@
 
                     </div>
                     <div ng-show="isLogin" style="float: right;">
-                        <p style="white-space: pre;"><FONT SIZE=2>Welcome,{{username}}   </FONT> </p>
+                        <p style="white-space: pre;"><FONT SIZE=2>Welcome, {{username}}   </FONT> </p>
                     </div>
                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#signupModal" ng-show="!isLogin" style="float: right; ">Sign up</button>
                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#loginModal" ng-show="!isLogin" style="float: right;">Log in</button>
@@ -349,7 +349,7 @@
             <section layout="row" flex>
                 <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
                     <md-toolbar class="md-theme-indigo">
-                        <h1 class="md-toolbar-tools">Sidenav Left</h1>
+                        <h1 class="md-toolbar-tools">Question List</h1>
                     </md-toolbar>
                     <md-content layout-padding style="overflow-x: hidden">
                         <div class="row">
@@ -357,7 +357,7 @@
                                 Close Sidenav Left
                             </md-button>
                             <p hide-md show-gt-md>
-                                This sidenav is locked open on your device. To go back to the default behavior, narrow your display.
+                                Choose question from the list below.
                             </p>
                         </div>
                         <md-content>
@@ -414,9 +414,13 @@
                         </div>
                     </div>
 
-                    <div style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
+                    <div flex style="position:fixed; bottom:0; background-color:#3F51B5; width:100%; padding: 0px;">
                         <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
                         <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
+                        
+                        <div style="float: right;">
+                            <p style="white-space: pre;"><FONT SIZE=1>powered by wit543@gmail.com   </FONT> </p>
+                        </div>
                     </div>
 
                     <!--
@@ -444,3 +448,4 @@
 </body>
 
 </html>
+
