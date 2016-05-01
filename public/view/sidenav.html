@@ -59,7 +59,7 @@
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
                             $scope.getProgress();
-                            window.alert("login as: " + $scope.username);
+                            window.alert("Welcome, " + $scope.username);
                         } else {
                             console.log(res.data.message);
                             window.alert("Please check your username and password");
