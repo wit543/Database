@@ -26,6 +26,47 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
             var answer = req.body.question_id;
 
         });
+        router.get("/allTables", function(req,res){
+          var query = "SHOW tables";
+          connectionSandbox.query(query, function(err,row){
+            if(err){
+              res.json({
+                  "error": true,
+                  "error_message": "" + err,
+              });
+            }else{
+              var table = [];
+              for(i in row){
+                var q = "SELECT * FROM "+row[i].Tables_in_ske;
+                console.log(row[i]);
+                var count =0;
+                connectionSandbox.query(q,function(err,rowA){
+                  if(err){
+                    res.json({
+                        "error": true,
+                        "error_message": "" + err,
+                    });
+                    return;
+                  }
+                  else{
+                  var r={};
+                  r['val']=rowA;
+                  r['name']=row[count].Tables_in_ske;
+                  count++;
+                  table.push(r);
+                  console.log(r);
+                  console.log(table[0]);
+                  if(i==table.length-1){
+                    res.json({
+                      "row":table
+                    });
+                  }
+                }
+                });
+              }
+            }
+          });
+        });
         router.post("/query", function(req, res) {
             var query = req.body.query;
             console.log("sandbox: " + query);
@@ -113,6 +154,94 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                 }
             });
         });
+        router.post("/queryReturnQuery", function(req, res) {
+            var query = req.body.query;
+            console.log("sandbox: " + query);
+            connectionSandbox.query(query, function(err, row) {
+                if (err) {
+                    res.json({
+                        "error": true,
+                        "error_message": "" + err,
+                        "correct": false
+                    });
+                } else {
+                    if (req.body.problem_id) {
+                        var queryAnswer = "SELECT solution FROM problems WHERE problem_id = " + req.body.problem_id;
+                        connectionProblem.query(queryAnswer, function(errA, rowA) {
+                            if (errA) {
+                                console.log("1: " + errA);
+                                return;
+                            }
+                            var answerQuery = rowA[0].solution;
+                            console.log(answerQuery);
+                            connectionSandbox.query(answerQuery, function(errA, rowA) {
+                                if (errA) {
+                                    console.log("2: " + errA);
+                                    return;
+                                }
+                                var answer = rowA;
+                                if (JSON.stringify(answer) == JSON.stringify(row)) {
+                                    res.json({
+                                        "error": false,
+                                        "error_message": "",
+                                        "row": row,
+                                        "correct": true
+                                    });
+                                } else {
+                                    res.json({
+                                        "error": false,
+                                        "error_message": "",
+                                        "row": row,
+                                        "correct": false
+                                    });
+                                }
+                                var token = req.body.token || req.param('token') || req.headers['x-access-token'] || req.headers.authorization;
+                                if (token) {
+
+                                    // verifies secret and checks exp
+                                    jwt.verify(token, privateKey, function(err, decoded) {
+                                        if (err) {
+                                            console.log(err);
+                                            return;
+                                        }
+                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row) )+ ")";
+                                        connectionProblem.query(insertQuery, function(err, row) {
+                                            if (err) {
+                                                console.log("Err insert: "+err);
+                                                console.log(insertQuery);
+                                            } else if (row.affectedRows == 0) {
+                                                console.log(row);
+                                            }
+                                            else{
+                                              console.log(row);
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        connectionSandbox.query(req.body.query, function(err, row) {
+                            if (err) {
+                                res.json({
+                                    "error": true,
+                                    "error_message": "" + err,
+                                    "correct": false
+                                });
+                            } else {
+                                res.json({
+                                    "error": false,
+                                    "error_message": "",
+                                    "row": row,
+                                    "query":req.body.query
+                                });
+                            }
+                        });
+                    }
+
+                }
+            });
+        });
 
     }
     // module.exports = sandbox_rounter;
@@ -169,6 +298,7 @@ PROBLEM_ROUTER.prototype.handleRoutes = function(router, connection) {
             }
         });
     });
+
     router.post("/hasProblem", function(req, res) {
         var query = "SELECT * FROM problems WHERE problem_id = " + req.body.id;
         connection.query(query, function(err, row) {
