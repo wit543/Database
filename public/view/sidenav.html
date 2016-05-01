@@ -59,7 +59,7 @@
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
                             $scope.getProgress();
-                            window.alert("login as: " + $scope.username);
+
                         } else {
                             console.log(res.data.message);
                             window.alert("Please check your username and password");
@@ -78,12 +78,12 @@
                 if ($scope.username == "" || $scope.password == "" || $scope.confirmpassword == "" || ($scope.password != $scope.confirmpassword)) {
                     window.alert("Please check your infomation");
                 } else {
-                    window.alert("sign up with username: " + $scope.username + "\npassword: " + $scope.password);
                     if (!$scope.isLogin) {
                         $http.post("api/createNewUser", {
                             "username": $scope.username,
                             "password": $scope.password
                         }).then(function success(res) {
+                          window.alert(res);
                             console.log(res);
                         }, function error(res) {
                             console.log(res);
@@ -322,7 +322,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Username:</p>  <input  ng-model="username"> <br>
-                    <p>Password:</p>  <input  ng-model="password"> <br>
+                    <p>Password:</p>  <input type="password" ng-model="password"> <br>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -341,8 +341,8 @@
                 </div>
                 <div class="modal-body">
                     <p>Username:</p>  <input  ng-model="username"> <br>
-                    <p>Password:</p>  <input  ng-model="password"> <br>
-                    <p>Confirm Password:</p>  <input  ng-model="confirmpassword"> <br>
+                    <p>Password:</p>  <input type="password" ng-model="password"> <br>
+                    <p>Confirm Password:</p>  <input type="password" ng-model="confirmpassword"> <br>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -353,7 +353,7 @@
         </div>
         <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
             <section layout="row" flex>
-                <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
+                <md-sidenav class="md-sidenav-left " md-component-id="left" md-whiteframe="4">
                     <md-toolbar class="md-theme-indigo">
                         <h1 class="md-toolbar-tools">Question List</h1>
                     </md-toolbar>
