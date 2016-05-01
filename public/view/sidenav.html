@@ -79,11 +79,11 @@
                 } else {
                     window.alert("sign up with username: " + $scope.username + "\npassword: " + $scope.password);
                     if (!$scope.isLogin) {
-                        http.post("api/createNewUser", {
-                            "username": $scope.usernamem,
+                        $http.post("api/createNewUser", {
+                            "username": $scope.username,
                             "password": $scope.password
                         }).then(function success(res) {
-
+                            console.log(res);
                         }, function error(res) {
                             console.log(res);
                         });
@@ -204,6 +204,7 @@
             $scope.current_problem_id;
             $scope.selectq = function(id) {
                 $scope.current_problem_id = id;
+                $scope.updateTextProgress($scope.current_problem_id);
                 $http.post("/api/problem", {
                     "id": id
                 }).then(function success(res) {
@@ -211,6 +212,7 @@
                         console.log(res.data.error_message);
                     }
                     $scope.question = res.data.problem;
+                    $scope.query="";
                     console.log(res.data.problem);
                 }, function err(res) {
                     console.log("ERR" + res);
@@ -225,6 +227,10 @@
                     console.log("ERR" + res);
                 });
             };
+            $scope.updateTextProgress =function (id){
+              console.log($scope.progrss);
+              // $scope.query = $scope.progrss
+            }
             $scope.toggleLeft = buildDelayedToggler('left');
             /**
              * Supplies a function that will continue to operate until the

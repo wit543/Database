@@ -387,7 +387,7 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
         });
     });
     router.get('/progress', function(req, res) {
-        var query = "SELECT * FROM grading_list WHERE username = '" + req.decoded.username + "'";
+        var query = "SELECT * FROM grading_list WHERE username = '" + req.decoded.username + "' ORDER BY problem_id, time";
         connection.query(query, function(err, row) {
             if (err) {
                 res.json({
