@@ -59,7 +59,7 @@
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
                             $scope.getProgress();
-                            window.alert("login as: " + $scope.username);
+                            window.alert("Welcome, " + $scope.username);
                         } else {
                             console.log(res.data.message);
                             window.alert("Please check your username and password");
@@ -80,11 +80,11 @@
                 } else {
                     window.alert("sign up with username: " + $scope.username + "\npassword: " + $scope.password);
                     if (!$scope.isLogin) {
-                        $http.post("api/createNewUser", {
-                            "username": $scope.username,
+                        http.post("api/createNewUser", {
+                            "username": $scope.usernamem,
                             "password": $scope.password
                         }).then(function success(res) {
-                            console.log(res);
+
                         }, function error(res) {
                             console.log(res);
                         });
@@ -205,7 +205,6 @@
             $scope.current_problem_id;
             $scope.selectq = function(id) {
                 $scope.current_problem_id = id;
-                $scope.updateTextProgress($scope.current_problem_id);
                 $http.post("/api/problem", {
                     "id": id
                 }).then(function success(res) {
@@ -213,7 +212,6 @@
                         console.log(res.data.error_message);
                     }
                     $scope.question = res.data.problem;
-                    $scope.query="";
                     console.log(res.data.problem);
                 }, function err(res) {
                     console.log("ERR" + res);
@@ -228,10 +226,6 @@
                     console.log("ERR" + res);
                 });
             };
-            $scope.updateTextProgress =function (id){
-              console.log($scope.progrss);
-              // $scope.query = $scope.progrss
-            }
             $scope.toggleLeft = buildDelayedToggler('left');
             /**
              * Supplies a function that will continue to operate until the
@@ -274,7 +268,10 @@
                         });
                 }
             }
+            
+            
 
+            
 
             $scope.openLeftMenu = function() {
                 console.log("in");
@@ -284,6 +281,14 @@
 
 
         });
+        app.controller('LeftCtrl', function ($scope, $timeout, $mdSidenav, $log) {
+                $scope.close = function () {
+                    $mdSidenav('left').close()
+                        .then(function () {
+                        $log.debug("close LEFT is done");
+                    });
+                };
+            });
     </script>
 
 
@@ -353,14 +358,14 @@
         </div>
         <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
             <section layout="row" flex>
-                <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop md-whiteframe="4">
+                <md-sidenav class="md-sidenav-left " md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-whiteframe="4">
                     <md-toolbar class="md-theme-indigo">
                         <h1 class="md-toolbar-tools">Question List</h1>
                     </md-toolbar>
-                    <md-content layout-padding style="overflow-x: hidden">
+                    <md-content ng-controller="LeftCtrl" layout-padding style="overflow-x: hidden">
                         <div class="row">
-                            <md-button class="md-primary" hide-gt-md>
-                                Close Sidenav Left
+                            <md-button ng-click="close()"  class="md-primary" hide-gt-md>
+                                Close
                             </md-button>
                             <p hide-md show-gt-md>
                                 Choose question from the list below. Click 'Show table' for information.
@@ -424,7 +429,7 @@
                         <md-button class="md-raised md-primary" ng-click="submit()">{{buttonSummit}}</md-button>
                         <md-button class="md-raised md-warn" ng-click="getSolution()">Give Up</md-button>
                         <md-button class="md-raised" onclick="window.open('http://wit543.xyz/showTable')">Show Table</md-button>
-
+                        
                         <div style="float: right;">
                             <p style="white-space: pre;"><FONT SIZE=1>powered by wit543@gmail.com     </FONT> </p>
                         </div>
@@ -454,3 +459,4 @@
 </body>
 
 </html>
+
