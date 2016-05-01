@@ -403,6 +403,7 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
         });
 
     });
+    // router.get
 };
 REST.prototype.connectMysql = function() {
     var self = this;
