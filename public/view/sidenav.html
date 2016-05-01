@@ -50,7 +50,6 @@
                 if ($scope.username == "" || $scope.password == "") {
                     window.alert("Please check your infomation");
                 } else {
-                    window.alert("login as: " + $scope.username);
                     $http.post("api/authenticate", {
                         "username": $scope.username,
                         "password": $scope.password
@@ -60,8 +59,10 @@
                             $window.sessionStorage.token = res.data.token;
                             $scope.isLogin = true;
                             $scope.getProgress();
+                            window.alert("login as: " + $scope.username);
                         } else {
                             console.log(res.data.message);
+                            window.alert("Please check your username and password");
                         }
                     }, function err(res) {
                         console.log(res);
