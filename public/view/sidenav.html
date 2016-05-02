@@ -71,8 +71,11 @@
             }
             $scope.logout = function() {
                 delete $window.sessionStorage.token;
-                window.alert("Log out successful!");
                 $scope.isLogin = false;
+                $scope.progress=[];
+                $scope.getProgress();
+                window.alert("Log out successful!");
+
             };
             $scope.signup = function() {
                 if ($scope.username == "" || $scope.password == "" || $scope.confirmpassword == "" || ($scope.password != $scope.confirmpassword)) {
@@ -152,7 +155,7 @@
                     if (res.data.correct) {
                         $scope.buttonSummit = "next";
                         $scope.getProgress();
-                        // $scope.progressCheck=true;
+                        $scope.progressCheck=true;
                     }
                 }, function err(res) {
                     console.log("ERR" + res);
