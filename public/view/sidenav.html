@@ -12,7 +12,7 @@
     <!-- angular Material -->
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
     <!-- bootstrap -->
-    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <!-- material style -->
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
@@ -46,6 +46,7 @@
             $scope.username = "wit";
             $scope.password = "321";
             $scope.isLogin = false;
+            $scope.question = "FREE MODE(select a question on the left)";
             $scope.login = function() {
                 if ($scope.username == "" || $scope.password == "") {
                     window.alert("Please check your infomation");
@@ -82,7 +83,7 @@
                             "username": $scope.usernamem,
                             "password": $scope.password
                         }).then(function success(res) {
-                          window.alert(res);
+                            window.alert(res);
                             console.log(res);
                         }, function error(res) {
                             console.log(res);
@@ -92,10 +93,9 @@
             }
             $scope.getProgress = function() {
                 if ($scope.isLogin) {
-                    $http.get('/api/progress', function() {
-                    }).then(function success(res) {
-                      console.log("progrsss");
-                      console.log(res.data.row);
+                    $http.get('/api/progress', function() {}).then(function success(res) {
+                        console.log("progrsss");
+                        console.log(res.data.row);
                         $scope.progress = res.data.row;
                     }, function error(res) {
                         console.log(res);
@@ -106,12 +106,19 @@
             if ($window.sessionStorage.token) {
                 $http.get("/api/check")
                     .then(function success(res) {
-                      $scope.isLogin=true;
-                      $scope.username= res.data.username;
-                      $scope.getProgress();
-                        console.log(res);
+                        if (res.data.success) {
+                            $scope.isLogin = true;
+                            console.log(res);
+                            $scope.username = res.data.username;
+                            $scope.getProgress();
+                            console.log(res);
+                        } else {
+                            delete $window.sessionStorage.token;
+                            $scope.isLogin = false;
+                        }
+
                     }, function error(res) {
-                      $scope.isLogin=false;
+                        $scope.isLogin = false;
                         // $scope.login();
                     });
             }
@@ -131,7 +138,7 @@
                 }
                 console.log($scope.query);
                 $http.post("/api/query", {
-                    "query": $scope.query,
+                    "query": ""+$scope.query,
                     "problem_id": $scope.current_problem_id
                 }).then(function success(res) {
                     console.log(res.data);
@@ -178,12 +185,12 @@
             $scope.isInSub = function(sub, category) {
                 return sub == category;
             };
-            $scope.isDone = function(id){
-                for(var i in $scope.progress){
-                  console.log($scope.progress[i].problem_id+" "+id+" "+$scope.progress[i].correctness);
-                  if($scope.progress[i].problem_id==id && $scope.progress[i].correctness){
-                    return true;
-                  }
+            $scope.isDone = function(id) {
+                for (var i in $scope.progress) {
+                    console.log($scope.progress[i].problem_id + " " + id + " " + $scope.progress[i].correctness);
+                    if ($scope.progress[i].problem_id == id && $scope.progress[i].correctness) {
+                        return true;
+                    }
                 }
                 return false;
             };
@@ -280,14 +287,14 @@
 
 
         });
-        app.controller('LeftCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-                $scope.close = function () {
-                    $mdSidenav('left').close()
-                        .then(function () {
+        app.controller('LeftCtrl', function($scope, $timeout, $mdSidenav, $log) {
+            $scope.close = function() {
+                $mdSidenav('left').close()
+                    .then(function() {
                         $log.debug("close LEFT is done");
                     });
-                };
-            });
+            };
+        });
     </script>
 
 
@@ -296,64 +303,75 @@
     <div ng-app="sidenav" ng-controller="AppCtrl">
         <div layout="column">
             <md-toolbar class="md-hue-2">
-                <div class="md-toolbar-tools" >
+                <div class="md-toolbar-tools">
                     <md-button class="md-icon-button" aria-label="Settings" ng-click="openLeftMenu()">
-                        <img src="http://wit543.xyz/images/ic_list_black_48dp_2x.png">
+                        <img src="http://wit543.xyz/images/ic_menu_white_24dp_1x.png">
                     </md-button>
                     <h2>
                <span> Wit543 Database School </span>
              </h2>
-                <div flex>
-                    <button class="btn btn-primary btn-sm" ng-show="isLogin" ng-click="logout()" style="float: right;">Log out</button>
-                    <div style="float: right;">
+                    <div flex>
+                        <button class="btn btn-primary btn-sm" ng-show="isLogin" ng-click="logout()" style="float: right;">Log out</button>
+                        <div style="float: right;">
 
+                        </div>
+                        <div ng-show="isLogin" style="float: right;">
+                            <p style="white-space: pre;">
+                                <FONT SIZE=2>Welcome, {{username}}   </FONT> </p>
+                        </div>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#signupModal" ng-show="!isLogin" style="float: right; ">Sign up</button>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#loginModal" ng-show="!isLogin" style="float: right;">Log in</button>
                     </div>
-                    <div ng-show="isLogin" style="float: right;">
-                        <p style="white-space: pre;"><FONT SIZE=2>Welcome, {{username}}   </FONT> </p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#signupModal" ng-show="!isLogin" style="float: right; ">Sign up</button>
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#loginModal" ng-show="!isLogin" style="float: right;">Log in</button>
-                </div>
                 </div>
             </md-toolbar>
         </div>
         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="loginModalLabel">Login</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Username:</p>  <input  ng-model="username"> <br>
-                    <p>Password:</p>  <input type="password" ng-model="password"> <br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="login()">Login</button>
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="loginModalLabel">Login</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Username:</p>
+                        <input ng-model="username">
+                        <br>
+                        <p>Password:</p>
+                        <input type="password" ng-model="password">
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="login()">Login</button>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
         <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="signupModalLabel">Sign up</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Username:</p>  <input  ng-model="username"> <br>
-                    <p>Password:</p>  <input type="password" ng-model="password"> <br>
-                    <p>Confirm Password:</p>  <input type="password" ng-model="confirmpassword"> <br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="signup()">Sign Up</button>
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="signupModalLabel">Sign up</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Username:</p>
+                        <input ng-model="username">
+                        <br>
+                        <p>Password:</p>
+                        <input type="password" ng-model="password">
+                        <br>
+                        <p>Confirm Password:</p>
+                        <input type="password" ng-model="confirmpassword">
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="signup()">Sign Up</button>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
         <div layout="column" layout="row" style="overflow-x: hidden; height: calc(100% - 64px);">
             <section layout="row" flex>
@@ -363,7 +381,7 @@
                     </md-toolbar>
                     <md-content ng-controller="LeftCtrl" layout-padding style="overflow-x: hidden">
                         <div class="row">
-                            <md-button ng-click="close()"  class="md-primary" hide-gt-md>
+                            <md-button ng-click="close()" class="md-primary" hide-gt-md>
                                 Close
                             </md-button>
                             <p hide-md show-gt-md>
@@ -372,12 +390,14 @@
                         </div>
                         <md-content>
                             <md-list flex>
-                                <md-list ng-model="progressCheck"  flex ng-repeat="subhead in subheads">
+                                <md-list ng-model="progressCheck" flex ng-repeat="subhead in subheads">
                                     <md-subheader class="md-no-sticky" ng-click="clickSubHead(subhead)"> {{ subhead.name }} </md-subheader>
                                     <ul>
                                         <li ng-repeat="question in questions" ng-if="isInSub(subhead.id,question.chapter_id)" ng-click="selectq(question.problem_id)" ng-show="subhead.expand">
-                                            <div layout="row" >
-                                              <div style="width:80%;"><p style="font-size:12px" >{{ question.header }}</p></div>
+                                            <div layout="row">
+                                                <div style="width:80%;">
+                                                    <p style="font-size:12px">{{ question.header }}</p>
+                                                </div>
                                                 <div ng-if="isDone(question.problem_id)" style="width:20%; height:1em; background-color:#0F0;"></div>
                                             </div>
                                         </li>
@@ -401,7 +421,7 @@
                                 <form>
 
                                     <h3>Question: {{question}}</h3>
-                                        <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none ; height: calc(100% - 192px); min-height:64px "></textarea>
+                                    <textarea type="text" rows="4" cols="50" class="form-control" ng-model="query" placeholder="SELECT * FROM classroom" style="overflow:auto;resize:none ; height: calc(100% - 192px); min-height:64px "></textarea>
                                 </form>
                             </div>
                             <div class="col-md-8" id="result" style="  height: calc(100vh - 192px); min-height:128px">
@@ -430,7 +450,8 @@
                         <md-button class="md-raised" onclick="window.open('http://wit543.xyz/showTable')">Show Table</md-button>
 
                         <div style="float: right;">
-                            <p style="white-space: pre;"><FONT SIZE=1>powered by wit543@gmail.com     </FONT> </p>
+                            <p style="white-space: pre;">
+                                <FONT SIZE=1>powered by wit543@gmail.com     </FONT> </p>
                         </div>
                     </div>
 

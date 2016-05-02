@@ -26,46 +26,45 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
             var answer = req.body.question_id;
 
         });
-        router.get("/allTables", function(req,res){
-          var query = "SHOW tables";
-          connectionSandbox.query(query, function(err,row){
-            if(err){
-              res.json({
-                  "error": true,
-                  "error_message": "" + err,
-              });
-            }else{
-              var table = [];
-              for(i in row){
-                var q = "SELECT * FROM "+row[i].Tables_in_ske;
-                console.log(row[i]);
-                var count =0;
-                connectionSandbox.query(q,function(err,rowA){
-                  if(err){
+        router.get("/allTables", function(req, res) {
+            var query = "SHOW tables";
+            connectionSandbox.query(query, function(err, row) {
+                if (err) {
                     res.json({
                         "error": true,
                         "error_message": "" + err,
                     });
-                    return;
-                  }
-                  else{
-                  var r={};
-                  r['val']=rowA;
-                  r['name']=row[count].Tables_in_ske;
-                  count++;
-                  table.push(r);
-                  console.log(r);
-                  console.log(table[0]);
-                  if(i==table.length-1){
-                    res.json({
-                      "row":table
-                    });
-                  }
+                } else {
+                    var table = [];
+                    for (i in row) {
+                        var q = "SELECT * FROM " + row[i].Tables_in_ske;
+                        console.log(row[i]);
+                        var count = 0;
+                        connectionSandbox.query(q, function(err, rowA) {
+                            if (err) {
+                                res.json({
+                                    "error": true,
+                                    "error_message": "" + err,
+                                });
+                                return;
+                            } else {
+                                var r = {};
+                                r['val'] = rowA;
+                                r['name'] = row[count].Tables_in_ske;
+                                count++;
+                                table.push(r);
+                                console.log(r);
+                                console.log(table[0]);
+                                if (i == table.length - 1) {
+                                    res.json({
+                                        "row": table
+                                    });
+                                }
+                            }
+                        });
+                    }
                 }
-                });
-              }
-            }
-          });
+            });
         });
         router.post("/query", function(req, res) {
             var query = req.body.query;
@@ -117,16 +116,15 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                                             console.log(err);
                                             return;
                                         }
-                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row) )+ ")";
+                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row)) + ")";
                                         connectionProblem.query(insertQuery, function(err, row) {
                                             if (err) {
-                                                console.log("Err insert: "+err);
+                                                console.log("Err insert: " + err);
                                                 console.log(insertQuery);
                                             } else if (row.affectedRows == 0) {
                                                 console.log(row);
-                                            }
-                                            else{
-                                              console.log(row);
+                                            } else {
+                                                console.log(row);
                                             }
                                         });
                                     });
@@ -142,6 +140,7 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                                     "correct": false
                                 });
                             } else {
+                              console.log(row);
                                 res.json({
                                     "error": false,
                                     "error_message": "",
@@ -204,16 +203,15 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                                             console.log(err);
                                             return;
                                         }
-                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row) )+ ")";
+                                        var insertQuery = "INSERT INTO grading_list VALUES('" + decoded.username + "'," + req.body.problem_id + ",NOW(),'" + req.body.query + "'," + (JSON.stringify(answer) == JSON.stringify(row)) + ")";
                                         connectionProblem.query(insertQuery, function(err, row) {
                                             if (err) {
-                                                console.log("Err insert: "+err);
+                                                console.log("Err insert: " + err);
                                                 console.log(insertQuery);
                                             } else if (row.affectedRows == 0) {
                                                 console.log(row);
-                                            }
-                                            else{
-                                              console.log(row);
+                                            } else {
+                                                console.log(row);
                                             }
                                         });
                                     });
@@ -233,7 +231,7 @@ SANDBOX_ROUTER.prototype.handleRoutes = function(router, connectionSandbox, conn
                                     "error": false,
                                     "error_message": "",
                                     "row": row,
-                                    "query":req.body.query
+                                    "query": req.body.query
                                 });
                             }
                         });
@@ -616,13 +614,16 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 });
 app.get('/showTable', function(req, res) {
-        res.sendFile(__dirname + "/public/view/showTable.html");
-    })
-    // app.get('/images/ic_menu_white_48px',function(req,res){
-    //
-    //   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
-    //   res.end(img,"binary");
-    // })
+    res.sendFile(__dirname + "/public/view/showTable.html");
+});
+app.get('/favicon.ico', function(req, res) {
+    res.sendFile(__dirname + "/public/images/favicon.ico");
+});
+// app.get('/images/ic_menu_white_48px',function(req,res){
+//
+//   var img = fs.readFileSync('./public/images/ic_menu_white_48px.svg');
+//   res.end(img,"binary");
+// })
 app.get('/sidenav', function(req, res) {
     res.sendFile(__dirname + "/public/view/sidenav.html");
 })
