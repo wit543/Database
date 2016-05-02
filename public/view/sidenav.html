@@ -79,8 +79,8 @@
                     window.alert("Please check your infomation");
                 } else {
                     if (!$scope.isLogin) {
-                        http.post("api/createNewUser", {
-                            "username": $scope.usernamem,
+                        $http.post("api/createNewUser", {
+                            "username": $scope.username,
                             "password": $scope.password
                         }).then(function success(res) {
                             window.alert(res);

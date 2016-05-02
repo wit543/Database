@@ -413,6 +413,7 @@ AUTHENTICATION_ROUTER.prototype.handleRoutes = function(router, connection) {
                         console.log(hash);
                         var query = "INSERT IGNORE INTO user (username,password) VALUES (" + "'" + req.body.username + "','" + hash + "')";
                         connection.query(query, function(err, row) {
+                          console.log(row);
                             if (err) {
                                 res.json({
                                     "error": err,
